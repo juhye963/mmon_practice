@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="34ecdf39-dff1-4b5b-84d6-393b0fc1f50c" name="Default Changelist" comment="" />
+    <list default="true" id="34ecdf39-dff1-4b5b-84d6-393b0fc1f50c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/ConfirmPasswordController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/ForgotPasswordController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/ResetPasswordController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/VerificationController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/login/create.blade.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/test.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/test.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +25,9 @@
     <execution>
       <executable />
     </execution>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -102,6 +118,7 @@
     </include_path>
   </component>
   <component name="ProjectId" id="1a9ckx187rUUv2hZdzPsb3tX2ys" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -109,6 +126,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
   </component>
   <component name="RunManager">
@@ -131,7 +149,7 @@
       <workItem from="1586151578580" duration="1022000" />
       <workItem from="1586152717470" duration="9647000" />
       <workItem from="1586224331193" duration="17661000" />
-      <workItem from="1586303759348" duration="2971000" />
+      <workItem from="1586303759348" duration="15202000" />
     </task>
     <servers />
   </component>
@@ -139,15 +157,23 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="2601" y="261" width="573" height="524" key="StructurePopup" timestamp="1586312542898">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2601" y="261" width="573" height="524" key="StructurePopup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586312542898" />
     <state x="2572" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1586303771368">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586152718372" />
     <state x="2572" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586303771368" />
-    <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1586249999560">
+    <state x="2574" y="117" width="745" height="807" key="find.popup" timestamp="1586322944679">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586249999560" />
+    <state x="2574" y="117" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586322944679" />
+    <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1586312358727">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586312358727" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

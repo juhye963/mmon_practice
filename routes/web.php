@@ -13,10 +13,15 @@ use Illuminate\Support\Facades\Cache;
 
 Route::get('/', function () {
     return view('test');
-})->name('home');
+});
 
-Route::get('auth/login',[
-    'as' => 'login.create',
-    'uses' => 'Auth\LoginController@create'
-]);
+Route::get('/home',function(){
+    return view('home');
+});
+
+/*로그인 로그아웃*/
+Route::get('/login','SessionsController@create');
+Route::get('/logout','SessionsController@destroy');
+
+Route::post('/login','SessionsController@store');
 
