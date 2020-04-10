@@ -1,6 +1,6 @@
 <h1>이곳은 로그인폼입니다.</h1>
 
-<form action="{{'login'}}" method="post">
+<form action={{ route('sessions.store') }} method="post">
     {!! csrf_field() !!}
     <input type="text" name="email" placeholder="아이디(이메일형태)" value="{{ old('email') }}" autofocus>
     {!! $errors->first('email','<span class="form-error">:message</span>') !!}

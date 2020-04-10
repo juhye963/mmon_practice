@@ -1,7 +1,8 @@
 <h1>홈입니다.</h1>
-{{auth()->user()->name}} 님 환영합니다.
-<ul>
-    <li>로그인한 상태에만 올 수 있도록 만들기(컨트롤러 연결?)</li>
-    <li>나중에 판매자의 회사명, 등록한 판매상품 등 볼 수 있게하기 (엘로퀀트로 유저테이블과 has many 연결)</li>
-</ul>
-<button><a href="{{ action('SessionsController@destroy') }}">로그아웃</a></button>
+<p>{{auth()->user()->name}} 님 환영합니다.</p>
+<p>id : {{auth()->user()->id }}</p>
+<p>소속 브랜드 번호: {{auth()->user()->brand_id}}</p>
+<button><a href="{{ route('brands.edit') }}">브랜드수정</a></button>
+<button><a href="{{ route('sessions.destroy') }}">로그아웃</a></button>
+
+<!--직접 컨트롤러와 연결x 라우트 이름과 연결하기 = 확장성 좋아짐-->

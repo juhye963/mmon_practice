@@ -44,6 +44,8 @@ class SessionsController extends Controller
         auth()->logout();
         //flash('로그아웃되었습니다.'); App\Http\Controllers\flash() 라는 함수가 없다는 오류 뜸
         //Alert::success('성공','로그아웃 완료'); 컨트롤러에 Alert 클래스도 없음
+        //$request -> session() ->flash 이렇게 쓰는거여따..
+        //이 코드 아닌 방식으로 로그아웃하는 방법 찾아보기
 
         return redirect('/');
     }
