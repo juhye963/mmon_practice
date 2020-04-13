@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
@@ -26,26 +27,23 @@ class SessionsController extends Controller
             'password'=>'required|min:6',
         ]);
 
-        if(!auth()->attempt($request->only('email','password')))
-        {
+        if(!auth()->attempt($request->only('email','password'))){
             //flash('로그인 정보 불일치');
             return back()->withInput();
         }
 
-        //flash(auth()->user()->name. '님 환영합니다.');
-
         return redirect()->intended('home');
-
-        //return $request->all(); 사용자의 입력정보 넘어오는지 체크
     }
 
-    public function destroy()
+    public function destroy(Request $request)
     {
-        auth()->logout();
-        //flash('로그아웃되었습니다.'); App\Http\Controllers\flash() 라는 함수가 없다는 오류 뜸
-        //Alert::success('성공','로그아웃 완료'); 컨트롤러에 Alert 클래스도 없음
-        //$request -> session() ->flash 이렇게 쓰는거여따..
-        //이 코드 아닌 방식으로 로그아웃하는 방법 찾아보기
+        Auth::logout();
+
+        //로그아웃 후 뒤로가기 누르면 이전 로그인 남아있는 상태 해결 위한 코드
+        //forget() 은 세션에서 데이터 삭제. 세션의 모든 데이터 삭제는 flush()
+        //공식문서의 세션 챕터 참조
+        //새로 로그인하면 이전것은 사라지지만.. 마지막 유저의 세션정보 그대로 남아있는듯...
+        $request->session()->flush();
 
         return redirect('/');
     }

@@ -11,60 +11,80 @@ use Illuminate\Support\Facades\Cache;
 |
 */
 
+/*메인화면*/
 Route::get('/', function () {
     return view('test');
 });
-
-Route::get('/home',function(){
+Route::get('/home', function(){
     return view('home');
 })->name('home');
 
+
 /*회원가입*/
-// (라우트이름 지정하고 페이지에서 이름으로 찾도록 하는 방법 시도)
-// 한 라우트에 컨트롤러 여러개 쓴답시고 'uses'에 배열 주면 에러뜬다(스트링 달라고함)
-// 한 라우트에 두개 컨트롤러는 안된다함. http 리퀘스트 종류가 다르지 않은 이상.
-Route::get('/register',[
-    'as' => 'sellers.create', //이 이름으로 이 라우트 찾을거임
+Route::get('/register', [
+    'as' => 'sellers.create',
     'uses' => 'SellersController@create'
 ]);
-//라우트에 컨트롤러 없으면 invalid route action 나온다..? why??
-//get 라우트 쓸때는 method 이름을 특정해주어야한다는데..?(스택오버플로)
-Route::post('/register',[
+
+Route::post('/register', [
     'as' => 'sellers.store',
     'uses' => 'SellersController@store'
 ]);
 
 
 /*로그인 로그아웃*/
-Route::get('/login',[
+Route::get('/login', [
     'as' => 'sessions.create',
     'uses' => 'SessionsController@create'
 ]);
-Route::get('/logout',[
+Route::get('/logout', [
     'as' => 'sessions.destroy',
     'uses' => 'SessionsController@destroy'
 ]);
-
-Route::post('/login',[
+Route::post('/login', [
     'as' => 'sessions.store',
     'uses' => 'SessionsController@store'
 ]);
-/*
-Route::get('/brands',[
+
+
+//브랜드명 확인하는 곳
+/*Route::get('/brands',[
     'as' => 'brands',
     'uses' => 'BrandsController@index'
 ]);*/
 
 /*브랜드 수정*/
-Route::get('/brands/edit',[
+Route::get('/brands/edit', [
     'as' => 'brands.edit',
     'uses' => 'BrandsController@edit'
 ]);
-
-Route::post('/brands/update',[
+Route::post('/brands/update', [
    'as' => 'brands.update',
    'uses' => 'BrandsController@update'
 ]);
+
+
+/*상품등록*/
+Route::get('/products/create', [
+    'as' => 'products.create',
+    'uses' => 'ProductsController@create'
+]);
+Route::post('/products/store', [
+    'as' => 'products.store',
+    'uses' => 'ProductsController@store'
+]);
+//카테고리 정보 test 페이지
+/*Route::get('/categories',[
+    'as' => 'categories',
+    'uses' => 'CategoriesController@index'
+]);*/
+
+/*상품 display*/
+Route::get('/products/show',[
+    'as' => 'products.show',
+    'uses' => 'ProductsController@show'
+]);
+
 
 
 

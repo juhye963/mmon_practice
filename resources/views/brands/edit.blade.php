@@ -3,6 +3,15 @@
 {!! csrf_field() !!}
 <form action="{{ route('brands.update') }}" method="post">
     @csrf
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     @include('brands.select')
     <button type="submit">브랜드 변경</button>
 </form>
