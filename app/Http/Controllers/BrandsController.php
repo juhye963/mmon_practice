@@ -47,14 +47,19 @@ class BrandsController extends Controller
         //with()은 메서드체이닝 가능 = 여러변수 넘겨줘야하는 경우 씀
         //이 경우 여러 변수 넘겨줘야하니 with() 으로 바꾸기
 
-        //return view('brands.update',['current_brand' => $current_brand]);
+        //return view('brands.edit',['current_brand' => $current_brand]);
     }
 
     public function update(Request $request)
     {
+
         $current_seller = auth()->user()->id;
         $seller = Mall_Seller::find($current_seller);
+        //dd($seller);
         $seller->brand_id = $request->input('brand_id');
+        $seller->save();
+
+        return redirect()->route('home');
     }
 
 

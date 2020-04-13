@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Route::get('/home',function(){
     return view('home');
-});
+})->name('home');
 
 /*회원가입*/
 // (라우트이름 지정하고 페이지에서 이름으로 찾도록 하는 방법 시도)
