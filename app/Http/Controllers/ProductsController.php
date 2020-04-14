@@ -60,6 +60,7 @@ class ProductsController extends Controller
         $seller = auth()->user();
         $product_cnt = $seller->products()->count();
         $products = $seller->products()->paginate(5);
+        //$path = public_path('product_image/'.$);
 
         //$product_image = Storage::get($products->filename);
         // get 메소드는 파일의 내용을 검색하는 데 사용합니다. 이 메소드는 파일의 내용을 그대로 돌려줍니다.

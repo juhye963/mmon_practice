@@ -12,12 +12,11 @@ use Illuminate\Support\Facades\Cache;
 */
 
 /*메인화면*/
-Route::get('/', function () {
-    return view('test');
-});
-Route::get('/home', function(){
-    return view('home');
-})->name('home');
+
+Route::get('/',[
+    'as' => 'home',
+    'uses' => 'HomeController@index'
+]);
 
 
 /*회원가입*/

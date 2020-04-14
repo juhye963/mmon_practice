@@ -32,7 +32,7 @@ class SessionsController extends Controller
             return back()->withInput();
         }
 
-        return redirect()->intended('home');
+        return redirect('/');
     }
 
     public function destroy(Request $request)
