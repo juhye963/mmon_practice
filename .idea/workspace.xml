@@ -3,15 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="34ecdf39-dff1-4b5b-84d6-393b0fc1f50c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/BrandsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/BrandsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SellersController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SellersController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SessionsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SessionsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Mall_Brand.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Mall_Seller.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/auth.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/brands/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/brands/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/products/show.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/products/show.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,7 +163,8 @@
       <workItem from="1586419074008" duration="4780000" />
       <workItem from="1586476402529" duration="21258000" />
       <workItem from="1586735687958" duration="4182000" />
-      <workItem from="1586739891713" duration="22641000" />
+      <workItem from="1586739891713" duration="22878000" />
+      <workItem from="1586821783706" duration="2378000" />
     </task>
     <servers />
   </component>
@@ -219,10 +213,10 @@
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="2601" y="261" width="573" height="524" key="StructurePopup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586312542898" />
-    <state x="2572" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1586739891954">
-      <screen x="1920" y="0" width="1920" height="1040" />
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1586821898168">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586152718372" />
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586821898168" />
     <state x="2572" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586739891954" />
     <state x="654" y="117" width="745" height="807" key="find.popup" timestamp="1586765347248">
       <screen x="0" y="0" width="1920" height="1040" />

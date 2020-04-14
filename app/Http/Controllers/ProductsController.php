@@ -6,6 +6,7 @@ use App\Category;
 use App\Product;
 use App\Seller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductsController extends Controller
 {
@@ -57,9 +58,15 @@ class ProductsController extends Controller
         $product_cnt = $seller->products()->count();
         $products = $seller->products()->get();
 
+        //$product_image = Storage::get($products->filename);
+        // get 메소드는 파일의 내용을 검색하는 데 사용합니다. 이 메소드는 파일의 내용을 그대로 돌려줍니다.
+        // 주의할 점은 모든 파일의 패스는 디스크에 설정된 "루트" 와 상대 경로로 지정되어 져야 한다는 것입니다.
+        // 디스크에 설정된 '루트'는 config\filesystems.php 에 설정되어있음
+
         return view('products.show')->with([
             'product_cnt' => $product_cnt,
             'products' => $products
+            //'product_image' => $product_image
         ]);
     }
 }

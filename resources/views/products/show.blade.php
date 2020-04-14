@@ -2,7 +2,7 @@
 
 <p>{{auth()->user()->name}} 님이 업로드한 상품은 총 {{ $product_cnt }} 개 입니다.</p>
 
-<table>
+<table border="1" cellpadding="10">
     <tr>
         <th>상품번호</th>
         <th>상품명</th>
@@ -19,8 +19,8 @@
             <td>{{ $product->id }}</td>
             <td>{{ $product->name }}</td>
             <td>{{ $product->filename }}</td>
-            <td>{{ $product->price }}</td>
-            <td>{{ ($product->discount)*100 }}</td>
+            <td>{{ $product->price }} 원</td>
+            <td>{{ ($product->discount)*100 }} %</td>
             <td>할인가 계산</td>
             <td>{{ $product->amount }}</td>
             <td>{{ $product->brand_id }}</td>
