@@ -3,7 +3,7 @@
 @section('content')
 <h1>상품 조회 영역입니다.</h1>
 
-<p>{{auth()->user()->name}} 님이 업로드한 상품은 총 {{ $product_cnt }} 개 입니다.</p>
+<p>{{auth()->user()->name}} 님이 업로드한 상품은 총 {{ $products->total() }} 개 입니다.</p>
 
 <table border="1" cellpadding="10" class="table table-borderless table-sm">
     <thead class="thead-light">
@@ -26,8 +26,8 @@
             <td>{{ $product->price }} 원</td>
             <td>{{ $product->discount}} 원</td>
             <td>{{ $product->amount }}</td>
-            <td>{{ $product->brand_id }}</td>
-            <td>{{ $product->category_id }}</td>
+            <td>{{ $product->brand->name }}</td>
+            <td>{{ $product->category->name }}</td>
         </tr>
     @endforeach
 </table>

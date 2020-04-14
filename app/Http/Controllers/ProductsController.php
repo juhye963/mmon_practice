@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Brand;
 use App\Category;
 use App\Product;
 use App\Seller;
@@ -20,7 +21,7 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|max:255|unique:mall_products,name',
+            'name' => 'required|max:255',
             'price' => 'required|min:1|max:1000000',
             'discount' => 'required|min:1|max:1000000|lte:price',
             'amount' => 'required|min:0|max:1000',
@@ -55,22 +56,15 @@ class ProductsController extends Controller
         return redirect( route('home'));
     }
 
-    public function show()
+    public function index()
     {
         $seller = auth()->user();
-        $product_cnt = $seller->products()->count();
-        $products = $seller->products()->paginate(5);
-        //$path = public_path('product_image/'.$);
+        $products = $seller->products()->with('brand','category')->paginate(5);
+        //https://laravel.kr/docs/6.x/eloquent-relationships#eager-loading 참고
+        //https://stackoverflow.com/questions/48732007/laravel-eloquent-relation-for-getting-user-name-for-a-specific-id
 
-        //$product_image = Storage::get($products->filename);
-        // get 메소드는 파일의 내용을 검색하는 데 사용합니다. 이 메소드는 파일의 내용을 그대로 돌려줍니다.
-        // 주의할 점은 모든 파일의 패스는 디스크에 설정된 "루트" 와 상대 경로로 지정되어 져야 한다는 것입니다.
-        // 디스크에 설정된 '루트'는 config\filesystems.php 에 설정되어있음
-
-        return view('products.show')->with([
-            'product_cnt' => $product_cnt,
+        return view('products.index')->with([
             'products' => $products
-            //'product_image' => $product_image
         ]);
     }
 }

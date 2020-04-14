@@ -79,9 +79,9 @@ Route::post('/products/store', [
 ]);*/
 
 /*상품 display*/
-Route::get('/products/show',[
-    'as' => 'products.show',
-    'uses' => 'ProductsController@show'
+Route::get('/products/index',[
+    'as' => 'products.index',
+    'uses' => 'ProductsController@index'
 ]);
 
 

@@ -31,7 +31,7 @@ class SellersController extends Controller
         $seller = Seller::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'passwod' => bcrypt($request->input('password')),
+            'password' => bcrypt($request->input('password')),
             'brand_id' => $request->input('brand_id')
         ]);
         // https://laravel.kr/docs/6.x/requests#%EC%9E%85%EB%A0%A5%EA%B0%92%20%EC%A1%B0%ED%9A%8C%ED%95%98%EA%B8%B0
@@ -43,7 +43,11 @@ class SellersController extends Controller
         $seller = auth()->user();
         // config\auth.php 의 설정이 auth 부르면 App\Seller 모델 부른다는 뜻임
 
-        $sellers_brand = $seller->brand()->first();
+        $sellers_brand = $seller->brand;
+        //메서드로 호출안하면 그 모델 자체를 줌
+        //프로퍼티처럼 접근하면 이렇게됨
+        //메서드일때 쿼리빌더 모델?
+        //프로퍼티일때 모델 자체?
 
         return view('sellers.brand.edit')->with([
             'brand' => $sellers_brand,
