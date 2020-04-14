@@ -20,10 +20,11 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|max:255',
-            'price' => 'required|max:1000000',
-            'discount' => 'required|max:100',
-            'amount' => 'required|max:1000'
+            'name' => 'required|max:255|unique:mall_products,name',
+            'price' => 'required|min:1|max:1000000',
+            'discount' => 'required|min:1|max:1000000|lte:price',
+            'amount' => 'required|min:0|max:1000',
+            'category_id' => 'required|exists:mall_categories,id'
         ]);
 
         //required 오타나면 나오는 에러
@@ -31,16 +32,9 @@ class ProductsController extends Controller
 
         $product = new Product();
 
-        if($request->hasFile('product_image')){
-            $path = $request->file('product_image')->store('public/product_image');
-            $product->filename = $path;
-        }
-        //Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).
-        //php.ini 에서 해당 extension enable 하면 해결됨
-
         $product->name = $request->name;
         $product->price = $request->price;
-        $product->discount = ($request->discount)/100;
+        $product->discount = $request->discount;
         $product->amount = $request->amount;
         $product->seller_id = auth()->user()->id;
         $product->brand_id = auth()->user()->brand_id;
@@ -48,15 +42,24 @@ class ProductsController extends Controller
 
         $product->save();
 
+        if($request->hasFile('product_image')){
+            $path = $request->file('product_image')->storeAs('public/product_image',$product->id.'.png');
+            //확장자 jpg, png 설정하면 그대로 저장되긴하는데.. 이래도 되나?
+            $product->filename = $path;
+            $product->save();
+        }
+        //Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).
+        //php.ini 에서 해당 extension enable 하면 해결됨
+        // storage/app/public 에 저장됨
+
         return redirect( route('home'));
     }
 
     public function show()
     {
-        $current_seller_id = auth()->user()->id;
-        $seller = Seller::find($current_seller_id);
+        $seller = auth()->user();
         $product_cnt = $seller->products()->count();
-        $products = $seller->products()->get();
+        $products = $seller->products()->paginate(5);
 
         //$product_image = Storage::get($products->filename);
         // get 메소드는 파일의 내용을 검색하는 데 사용합니다. 이 메소드는 파일의 내용을 그대로 돌려줍니다.

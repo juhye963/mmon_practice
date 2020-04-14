@@ -53,14 +53,14 @@ Route::post('/login', [
     'uses' => 'BrandsController@index'
 ]);*/
 
-/*브랜드 수정*/
-Route::get('/brands/edit', [
-    'as' => 'brands.edit',
-    'uses' => 'BrandsController@edit'
+/*셀러의 브랜드 수정*/
+Route::get('/seller/brands/edit', [
+    'as' => 'seller.brand.edit',
+    'uses' => 'SellersController@brand_edit'
 ]);
-Route::post('/brands/update', [
-   'as' => 'brands.update',
-   'uses' => 'BrandsController@update'
+Route::post('/seller/brands/update', [
+   'as' => 'seller.brand.update',
+   'uses' => 'SellersController@brand_update'
 ]);
 
 

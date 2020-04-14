@@ -8,7 +8,6 @@
         <th>상품명</th>
         <th>첨부파일명</th>
         <th>가격</th>
-        <th>할인율</th>
         <th>할인가</th>
         <th>재고</th>
         <th>브랜드</th>
@@ -20,11 +19,12 @@
             <td>{{ $product->name }}</td>
             <td>{{ $product->filename }}</td>
             <td>{{ $product->price }} 원</td>
-            <td>{{ ($product->discount)*100 }} %</td>
-            <td>할인가 계산</td>
+            <td>{{ $product->discount}} 원</td>
             <td>{{ $product->amount }}</td>
             <td>{{ $product->brand_id }}</td>
             <td>{{ $product->category_id }}</td>
         </tr>
     @endforeach
 </table>
+
+{{ $products->links() }}

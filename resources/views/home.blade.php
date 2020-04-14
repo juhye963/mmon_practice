@@ -2,7 +2,7 @@
 <p>{{auth()->user()->name}} 님 환영합니다.</p>
 <p>id : {{auth()->user()->id }}</p>
 <p>소속 브랜드 번호: {{auth()->user()->brand_id}}</p>
-<button><a href="{{ route('brands.edit') }}">브랜드수정</a></button>
+<button><a href="{{ route('seller.brand.edit') }}">브랜드수정</a></button>
 <button><a href="{{ route('sessions.destroy') }}">로그아웃</a></button>
 <button><a href="{{ route('products.create') }}">상품등록</a></button>
 <button><a href="{{ route('products.show') }}">상품조회</a></button>
