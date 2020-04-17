@@ -1,6 +1,9 @@
+@extends('layouts.master')
+
+@section('content')
 <h1>이곳은 회원가입폼입니다.</h1>
 
-<form action={{ route('sellers.store') }} method="post">
+<form action={{ route('sellers.store') }} method="post" class="form__auth">
     {!! csrf_field() !!}
     {{--
     CSRF공격 막기 위해 _token 키 가진 숨은 필드 만드는 도우미 함수
@@ -28,3 +31,4 @@
 
     <button type="submit">회원가입</button>
 </form>
+@endsection

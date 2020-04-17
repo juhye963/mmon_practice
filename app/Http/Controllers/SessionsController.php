@@ -29,6 +29,7 @@ class SessionsController extends Controller
 
         if(!auth()->attempt($request->only('email','password'))){
             //flash('로그인 정보 불일치');
+            //flash('로그인정보 불일치')->warning();
             return back()->withInput();
         }
 

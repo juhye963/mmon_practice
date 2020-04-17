@@ -16,10 +16,8 @@ class CreateMallProductsTable extends Migration
         Schema::create('mall_products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('filename')->default('no image');
             $table->integer('price')->unsigned();
-            $table->integer('discount')->unsigned();
-            // 공식문서에서 constraint 와 decimal 검색 (여기에 CHECK 제약조건 걸 방법 찾기)
+            $table->integer('discounted_price')->unsigned();
             $table->unsignedMediumInteger('amount');
 
             $table->integer('seller_id')->unsigned();
@@ -35,6 +33,7 @@ class CreateMallProductsTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
+        // 공식문서에서 constraint 와 decimal 검색 (여기에 CHECK 제약조건 걸 방법 찾기) -> 할인율 컬럼 있을때
         //DB::statement('ALTER TABLE mall_products ADD CONSTRAINT chk_discount CHECK (discount <= 1.0000);');
         //mysql 은 check 제약조건 걸리지 않는다함(그래도 unsigned 는 잘 먹힘) -> 알고보니 0값으로 들어가고 insert 자체는 됨
         //workbench로 실험했을때는 1 이상의 값도 들어갔지만 실제로 웹사이트에서 넣어보니 위의 제약조건 지키고있음

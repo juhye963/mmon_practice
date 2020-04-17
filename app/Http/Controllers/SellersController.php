@@ -35,6 +35,8 @@ class SellersController extends Controller
             'brand_id' => $request->input('brand_id')
         ]);
         // https://laravel.kr/docs/6.x/requests#%EC%9E%85%EB%A0%A5%EA%B0%92%20%EC%A1%B0%ED%9A%8C%ED%95%98%EA%B8%B0
+
+        return redirect('home');
     }
 
     public function brand_edit()

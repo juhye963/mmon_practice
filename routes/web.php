@@ -51,7 +51,6 @@ Route::post('/login', [
     'as' => 'brands',
     'uses' => 'BrandsController@index'
 ]);*/
-
 /*셀러의 브랜드 수정*/
 Route::get('/seller/brands/edit', [
     'as' => 'seller.brand.edit',
@@ -84,6 +83,17 @@ Route::get('/products/index',[
     'uses' => 'ProductsController@index'
 ]);
 
+/*상품 삭제*/
+Route::get('/products/destroy/{product_id}',[
+    'as' => 'products.destroy',
+    'uses' => 'ProductsController@destroy'
+]);
+
+/*상품 검색*/
+/*Route::get('/products/search/{seller?}',[
+    'as' => 'products.search',
+    'uses' => 'ProductsController@search'
+]);*/
 
 
 
