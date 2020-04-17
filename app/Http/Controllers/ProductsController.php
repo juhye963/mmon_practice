@@ -63,11 +63,15 @@ class ProductsController extends Controller
         $parms['search_type'] = $request->input('search_type', '');
         $parms['search_word'] = $request->input('search_word', '');
         $parms['sort'] = $request->input('sort', '');
+        $parms['prds_status'] = $request->input('prds_status', '');
+        $parms['start_date'] = $request->input('start_date', '');
+        $parms['end_date'] = $request->input('end_date', '');
 
         //검색어 있을때는 검색유형 필수
         if ( $parms['search_word'] != '' ) {
             $request->validate([
-                'search_type' => 'required|max:255'
+                'search_type' => 'required'
+                //exists 이용하든 뭘하든 내가 설정한 검색유형중에 있는 값인지 확인하기
             ]);
         }
 
@@ -81,6 +85,27 @@ class ProductsController extends Controller
                 $query->where('name', 'LIKE', '%' . $parms['search_word'] . '%');
             });
         }
+
+        if ( $parms['prds_status'] != '') {
+            $products = $products->where('status', '=', $parms['prds_status']);
+        }
+
+        //현재보다 미래의 날짜는 입력할 수 없음 (날짜 찍히는거 보고 잘 비교하기)
+        //날짜 한쪽이 입력되면 다른 한쪽도 필요함
+        if ( $parms['start_date'] != '' || $parms['end_date'] != '' ) {
+            $request->validate([
+//                'start_date' => 'required|lte:date(\'Y-m-d\')',
+//                'end_date' => 'required|lte:date(\'Y-m-d\')'
+                'start_date' => 'required',
+                'end_date' => 'required'
+            ]);
+
+            //$products = $products->whereBetween('created_at', [$parms['start_date'], $parms['start_date']]);
+            $products = $products->where('created_at', '>=', $parms['start_date'])
+                ->where('created_at', '<=', $parms['end_date']);
+            //종료일은 포함되지 않음. 16일이 종료일이면 16일 상품은 안나옴
+        }
+
 
         //정렬조건 붙이기
         if ( $parms['sort'] != '') {
@@ -111,24 +136,17 @@ class ProductsController extends Controller
             '브랜드명' => 'brand'
         ];
 
-        /*$search_types = [
-            'prds_nm' => '상품명',
-            'seller' => '판매자 이름',
-            'brand' => '브랜드명'
-        ];
-
-        $sorts = [
-            'recent' => '최근 등록 순',
-            'price_asc' => '낮은 가격 순',
-            'price_desc' => '높은 가격 순',
-            'prds_nm_asc' => '상품명 순'
-        ];*/
-
         $sorts = [
             '최근 등록 순' => 'recent',
             '낮은 가격 순' => 'price_asc',
             '높은 가격 순' => 'price_desc',
             '상품명 순' => 'prds_nm_asc'
+        ];
+
+        $prds_status = [
+            '판매중' => 'selling',
+            '판매중지' => 'stop_selling',
+            '일시품절' => 'sold_out'
         ];
 
         $prds_theads = [
@@ -140,6 +158,8 @@ class ProductsController extends Controller
             '브랜드',
             '카테고리',
             '등록자',
+            '등록일',
+            '상태',
             '상품삭제',
         ];
 
@@ -149,7 +169,8 @@ class ProductsController extends Controller
             'parms' => $parms,
             'search_types' => $search_types,
             'sorts' => $sorts,
-            'prds_theads' => $prds_theads
+            'prds_theads' => $prds_theads,
+            'prds_status' => $prds_status
         ]);
     }
 

@@ -4,10 +4,7 @@
     <list default="true" id="34ecdf39-dff1-4b5b-84d6-393b0fc1f50c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/products/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/products/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/products/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/products/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/sellers/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/sellers/create.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +172,7 @@
       <workItem from="1586739891713" duration="22878000" />
       <workItem from="1586821783706" duration="26566000" />
       <workItem from="1586994567010" duration="27672000" />
-      <workItem from="1587080986679" duration="16419000" />
+      <workItem from="1587080986679" duration="24351000" />
     </task>
     <servers />
   </component>
@@ -234,10 +231,10 @@
     </state>
     <state x="647" y="127" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587084597657" />
     <state x="2574" y="117" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586747675373" />
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1587082637223">
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1587103586747">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587082637223" />
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587103586747" />
     <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586495982909" />
   </component>
   <component name="XDebuggerManager">
