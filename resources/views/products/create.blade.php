@@ -3,15 +3,7 @@
 <form action="{{ route('products.store') }}" method="post" enctype="multipart/form-data">
     @csrf
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    @include('errors.validate')
 
     <input type="text" name="name" placeholder="상품명" value="{{ old('name') }}" autofocus><br>
     <input type="file" name="product_image"><br>

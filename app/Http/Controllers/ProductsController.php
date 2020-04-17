@@ -46,7 +46,7 @@ class ProductsController extends Controller
         $product->save();
 
         if($request->hasFile('product_image')){
-            $path = $request->file('product_image')->storeAs('public/product_image',$product->id.'.png');
+            $path = $request->file('product_image')->storeAs('public/product_image', $product->id.'.png');
             //확장자 jpg, png 설정하면 그대로 저장되긴하는데.. 이래도 되나?
         }
         //Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).
@@ -58,88 +58,99 @@ class ProductsController extends Controller
 
     public function index(Request $request)
     {
-        /* 검색조건 */
-        if ($request->has('prds_nm')) {
-            $srch_key_org = $request->prds_nm;
-            $srch_key = '%'.$request->prds_nm.'%';
-            $query = Product::with('brand','category','seller')
-                ->where('name','like',$srch_key);
+        $products = Product::with('brand','category','seller');
+        $parms = $request->all();
+        $parms['search_type'] = $request->input('search_type', '');
+        $parms['search_word'] = $request->input('search_word', '');
+        $parms['sort'] = $request->input('sort', '');
 
-        } elseif ($request->has('seller_nm')) {
-
-            //dd($request->seller_nm);
-
-            $srch_key_org = $request->seller_nm;
-            $srch_key = '%'.$request->seller_nm.'%';
-
-            $query = Product::with('brand','category','seller')
-                ->whereHas('seller', function ( Builder $query) use ($srch_key) {
-                    $query->where('name', 'like', $srch_key);
-                });
-
-            //use Illuminate\Database\Eloquent\Builder; 여기에서 Eloquent 대신 Query를 가져오면 에러남
-            //https://laravel.kr/docs/6.x/eloquent-relationships#querying-relationship-existence 참고
-
-        } else {
-            $srch_key_org = 'none';
-            $query = Product::with('brand','category','seller');
+        //검색어 있을때는 검색유형 필수
+        if ( $parms['search_word'] != '' ) {
+            $request->validate([
+                'search_type' => 'required|max:255'
+            ]);
         }
 
-        //dd($srch_key_org);
+        //검색키워드로 찾기
+        //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
+        if ( $parms['search_type'] == 'prds_nm' ) {
+            //더 좋은 방법 있을듯(계속 생각해보기)
+            $products = $products->where('name', 'LIKE', '%' . $parms['search_word'] . '%');
+        } elseif ( $parms['search_type'] == 'seller' || $parms['search_type'] == 'brand') {
+            $products = $products->whereHas($parms['search_type'], function (Builder $query) use ($parms) {
+                $query->where('name', 'LIKE', '%' . $parms['search_word'] . '%');
+            });
+        }
 
-        //https://laravel.kr/docs/6.x/eloquent-relationships#eager-loading 참고
-        //https://stackoverflow.com/questions/48732007/laravel-eloquent-relation-for-getting-user-name-for-a-specific-id
-
-
-        /*정렬조건*/
-        if ($request->has('sort')) {
-            $sort = $request->sort;
-            //정렬조건과 검색키워드 유지하면서 페이징하기 위한 변수 custom
-            if ($request->has('prds_nm')) {
-                $custom = '?prds_nm='.$srch_key_org.'&seller_nm=&sort='.$sort;
-            } else if ($request->has('seller_nm')) {
-                //dd($srch_key_org);
-                $custom = '?prds_nm=&seller_nm='.$srch_key_org.'&sort='.$sort;
-                //dd($srch_key_org);
-            } else {
-                $custom = '?prds_nm=&seller_nm=&sort='.$sort;
-            }
-
-            //정렬조건따른 쿼리문
-            switch ($sort) {
+        //정렬조건 붙이기
+        if ( $parms['sort'] != '') {
+            switch ( $parms['sort'] ) {
                 case 'recent':
-                    $query_sort = $query->orderByDesc('updated_at');
+                    $products = $products->orderByDesc('updated_at');
                     break;
                 case 'price_asc' :
-                    $query_sort = $query->orderBy('price');
+                    $products = $products->orderBy('price');
                     break;
                 case 'price_desc' :
-                    $query_sort = $query->orderByDesc('price');
+                    $products = $products->orderByDesc('price');
                     break;
                 case 'prds_name':
-                    $query_sort = $query->orderBy('name');
+                    $products = $products->orderBy('name');
+                    break;
+                default :
+                    $products = $products->orderByDesc('id');
                     break;
             }
-        } else {
-            $sort = 'none';
-            $query_sort = $query;
         }
 
-        //위에서 생성한 custom 변수가 있으면 같이 페이징. 없으면 그냥 페이징
-        if ( $request->has('prds_nm') == false
-            && $request->has('seller_nm') == false
-            && $request->has('sort') == false ) {
-            $products = $query_sort->paginate(5);
-        } else {
-            $products = $query_sort->paginate(5)->withPath($custom);
-        }
+        $products = $products->paginate(5);
+
+        $search_types = [
+            '상품명' => 'prds_nm',
+            '판매자 이름' => 'seller',
+            '브랜드명' => 'brand'
+        ];
+
+        /*$search_types = [
+            'prds_nm' => '상품명',
+            'seller' => '판매자 이름',
+            'brand' => '브랜드명'
+        ];
+
+        $sorts = [
+            'recent' => '최근 등록 순',
+            'price_asc' => '낮은 가격 순',
+            'price_desc' => '높은 가격 순',
+            'prds_nm_asc' => '상품명 순'
+        ];*/
+
+        $sorts = [
+            '최근 등록 순' => 'recent',
+            '낮은 가격 순' => 'price_asc',
+            '높은 가격 순' => 'price_desc',
+            '상품명 순' => 'prds_nm_asc'
+        ];
+
+        $prds_theads = [
+            '상품번호',
+            '상품명',
+            '가격',
+            '할인가',
+            '재고',
+            '브랜드',
+            '카테고리',
+            '등록자',
+            '상품삭제',
+        ];
+
 
         return view('products.index')->with([
             'products' => $products,
-            'srch_key_org' => $srch_key_org,
-            'sort' => $sort
+            'parms' => $parms,
+            'search_types' => $search_types,
+            'sorts' => $sorts,
+            'prds_theads' => $prds_theads
         ]);
-
     }
 
     public function destroy($product_id)
@@ -160,8 +171,4 @@ class ProductsController extends Controller
         //https://laravel.kr/docs/6.x/controllers#defining-controllers 참고
     }
 
-    public function search()
-    {
-
-    }
 }
