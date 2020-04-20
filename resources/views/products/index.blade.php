@@ -4,9 +4,6 @@
 <h1>전체상품 조회 영역입니다.</h1>
 
 <p>총 {{ $products->total() }} 개의 상품이 조회되었습니다.</p>
-@foreach($parms as $key => $parm)
-    <li>{{ $key }} : {{ $parm }}</li>
-@endforeach
 
 오늘 날짜 : {{ date('Y-m-d') }}
 
@@ -16,31 +13,32 @@
     <form name="srch_frm" class="form-inline" action="{{ route('products.index') }}" method="get">
         <select class="form-control" name="search_type">
             @foreach($search_types as $key => $value)
-                <option value="{{ $value }}" {{ $value != $parms['search_type'] ? '' : 'selected' }}>{{ $key }}</option>
+                <option value="{{ $key }}" {{ $key != $parameters['search_type'] ? '' : 'selected' }}>{{ $value }}</option>
             @endforeach
         </select>
 
-        <input name="search_word" class="form-control mr-sm-2" type="search" placeholder="Search" value="{{ $parms['search_word'] }}">
+        <input name="search_word" class="form-control mr-sm-2" type="search" placeholder="Search" value="{{ $parameters['search_word'] }}">
 
         <select class="form-control" name="sort">
              @foreach($sorts as $key => $value)
-                <option value="{{ $value }}" {{ $value != $parms['sort'] ? '' : 'selected' }}>{{ $key }}</option>
+                <option value="{{ $key }}" {{ $key != $parameters['sort'] ? '' : 'selected' }}>{{ $value }}</option>
              @endforeach
         </select>
 
         <fieldset class="form-group">
-            시작일<input name="start_date" class="form-control" type="date" value="{{ $parms['start_date'] }}">
-            종료일<input name="end_date" class="form-control" type="date" value="{{ $parms['end_date'] }}">
+            시작일<input name="start_date" class="form-control" type="date" value="{{ $parameters['start_date'] }}">
+            종료일<input name="end_date" class="form-control" type="date" value="{{ $parameters['end_date'] }}">
         </fieldset>
 
-        <fieldset class="custom-control custom-radio">
-            <legend class="col-form-label-lg">상품상태</legend>
-            @foreach($prds_status as $key => $value)
-                <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="{{ $value }}" name="prds_status" value="{{ $value }}"
-                           class="custom-control-input" {{ $value != $parms['prds_status'] ? '' : 'checked' }}>
-                    <label class="custom-control-label" for="{{ $value }}">{{ $key }}</label>
-                </div>
+        <fieldset>
+            <legend>판매상태</legend>
+            @foreach($prds_status as $display_prds_status_key => $display_prds_status_value)
+                {{ $display_prds_status_value }}
+                <input type="checkbox" name="prds_status[]" value="{{ $display_prds_status_key }}"
+                @foreach($parameters['prds_status'] as $input_prds_status_value)
+                    {{ $display_prds_status_key != $input_prds_status_value ? '' : 'checked'}}
+                    @endforeach
+                >
             @endforeach
         </fieldset>
 
@@ -51,9 +49,17 @@
 <table cellpadding="10" class="table table-bordered text-center">
     <thead class="thead-light">
         <tr>
-            @foreach($prds_theads as $head)
-                <th>{{ $head }}</th>
-            @endforeach
+            <th>상품번호</th>
+            <th>상품명</th>
+            <th>가격</th>
+            <th>할인가</th>
+            <th>재고</th>
+            <th>브랜드</th>
+            <th>카테고리</th>
+            <th>등록자</th>
+            <th>등록일</th>
+            <th>상태</th>
+            <th>상품삭제</th>
         </tr>
     </thead>
     @foreach($products as $product)
@@ -74,14 +80,7 @@
 </table>
 
 <div class="pagination justify-content-center">
-{{ $products->appends([
-    'search_type' => $parms['search_type'],
-    'search_word' => $parms['search_word'],
-    'sort' => $parms['sort'],
-    'prds_status' => $parms['prds_status'],
-    'start_date' => $parms['start_date'],
-    'end_date' => $parms['end_date']
-    ])->links()}}
+{{ $products->appends($parameters)->links()}}
 </div>
 
 @endsection

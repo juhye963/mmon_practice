@@ -172,7 +172,8 @@
       <workItem from="1586739891713" duration="22878000" />
       <workItem from="1586821783706" duration="26566000" />
       <workItem from="1586994567010" duration="27672000" />
-      <workItem from="1587080986679" duration="24351000" />
+      <workItem from="1587080986679" duration="27414000" />
+      <workItem from="1587340817566" duration="4649000" />
     </task>
     <servers />
   </component>
@@ -221,20 +222,20 @@
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="2601" y="261" width="573" height="524" key="StructurePopup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586312542898" />
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1587081018949">
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1587340825800">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587081018949" />
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587340825800" />
     <state x="2572" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586739891954" />
-    <state x="647" y="127" width="745" height="807" key="find.popup" timestamp="1587084597657">
+    <state x="647" y="127" width="745" height="807" key="find.popup" timestamp="1587113379684">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="647" y="127" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587084597657" />
+    <state x="647" y="127" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587113379684" />
     <state x="2574" y="117" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586747675373" />
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1587103586747">
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1587341420542">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587103586747" />
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587341420542" />
     <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586495982909" />
   </component>
   <component name="XDebuggerManager">

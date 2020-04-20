@@ -47,7 +47,6 @@ class ProductsController extends Controller
 
         if($request->hasFile('product_image')){
             $path = $request->file('product_image')->storeAs('public/product_image', $product->id.'.png');
-            //확장자 jpg, png 설정하면 그대로 저장되긴하는데.. 이래도 되나?
         }
         //Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).
         //php.ini 에서 해당 extension enable 하면 해결됨
@@ -59,57 +58,65 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         $products = Product::with('brand','category','seller');
-        $parms = $request->all();
-        $parms['search_type'] = $request->input('search_type', '');
-        $parms['search_word'] = $request->input('search_word', '');
-        $parms['sort'] = $request->input('sort', '');
-        $parms['prds_status'] = $request->input('prds_status', '');
-        $parms['start_date'] = $request->input('start_date', '');
-        $parms['end_date'] = $request->input('end_date', '');
 
+        $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
+
+        $parameters['search_type'] = $request->input('search_type', '');
+        $parameters['search_word'] = $request->input('search_word', '');
+        $parameters['sort'] = $request->input('sort', '');
+        $parameters['prds_status'] = $request->input('prds_status', []); // 상품상태는 배열로 들어옴
+        $parameters['start_date'] = $request->input('start_date', '');
+        $parameters['end_date'] = $request->input('end_date', '');
+
+        /*validation*/
         //검색어 있을때는 검색유형 필수
-        if ( $parms['search_word'] != '' ) {
+        if ($parameters['search_word'] != '') {
             $request->validate([
                 'search_type' => 'required'
                 //exists 이용하든 뭘하든 내가 설정한 검색유형중에 있는 값인지 확인하기
             ]);
         }
 
-        //검색키워드로 찾기
-        //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
-        if ( $parms['search_type'] == 'prds_nm' ) {
-            //더 좋은 방법 있을듯(계속 생각해보기)
-            $products = $products->where('name', 'LIKE', '%' . $parms['search_word'] . '%');
-        } elseif ( $parms['search_type'] == 'seller' || $parms['search_type'] == 'brand') {
-            $products = $products->whereHas($parms['search_type'], function (Builder $query) use ($parms) {
-                $query->where('name', 'LIKE', '%' . $parms['search_word'] . '%');
-            });
-        }
-
-        if ( $parms['prds_status'] != '') {
-            $products = $products->where('status', '=', $parms['prds_status']);
-        }
-
         //현재보다 미래의 날짜는 입력할 수 없음 (날짜 찍히는거 보고 잘 비교하기)
         //날짜 한쪽이 입력되면 다른 한쪽도 필요함
-        if ( $parms['start_date'] != '' || $parms['end_date'] != '' ) {
+        if ($parameters['start_date'] != '' || $parameters['end_date'] != '') {
             $request->validate([
-//                'start_date' => 'required|lte:date(\'Y-m-d\')',
-//                'end_date' => 'required|lte:date(\'Y-m-d\')'
                 'start_date' => 'required',
                 'end_date' => 'required'
             ]);
+        }
 
-            //$products = $products->whereBetween('created_at', [$parms['start_date'], $parms['start_date']]);
-            $products = $products->where('created_at', '>=', $parms['start_date'])
-                ->where('created_at', '<=', $parms['end_date']);
+        /*조건적용*/
+        //검색키워드로 찾기
+        //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
+        if ($parameters['search_type'] == 'prds_nm') {
+            //더 좋은 방법 있을듯(계속 생각해보기)
+            $products = $products->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+        } elseif ($parameters['search_type'] == 'seller' || $parameters['search_type'] == 'brand') {
+            $products = $products->whereHas($parameters['search_type'], function (Builder $query) use ($parameters) {
+                $query->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+            });
+        }
+
+        //체크박스!!
+        if ($parameters['prds_status'] != []) {
+            //dd(count($parameters['prds_status']));
+            $products = $products->whereIn('status', $parameters['prds_status']);
+        }
+
+        //날짜검색 있을때
+        // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
+        if ($parameters['start_date'] != '' && $parameters['end_date'] != '' ) {
+            $end_date = date('Y-m-d', strtotime("+1 days", strtotime($parameters['end_date'])));
+            // 종료일 포함시키지 않는 문제 해결
+            //dd ($parameters['end_date']);
+            $products = $products->whereBetween('created_at', [$parameters['start_date'], $end_date]);
             //종료일은 포함되지 않음. 16일이 종료일이면 16일 상품은 안나옴
         }
 
-
         //정렬조건 붙이기
-        if ( $parms['sort'] != '') {
-            switch ( $parms['sort'] ) {
+        if ($parameters['sort'] != '') {
+            switch ( $parameters['sort'] ) {
                 case 'recent':
                     $products = $products->orderByDesc('updated_at');
                     break;
@@ -122,55 +129,43 @@ class ProductsController extends Controller
                 case 'prds_name':
                     $products = $products->orderBy('name');
                     break;
-                default :
+                /*default :
                     $products = $products->orderByDesc('id');
-                    break;
+                    break;*/
             }
+        } else {
+            $products = $products->orderByDesc('id');
         }
 
         $products = $products->paginate(5);
 
+        /*화면출력에 필요한 변수 설정*/
         $search_types = [
-            '상품명' => 'prds_nm',
-            '판매자 이름' => 'seller',
-            '브랜드명' => 'brand'
+            'prds_nm' => '상품명',
+            'seller' => '판매자 이름',
+            'brand' => '브랜드명'
         ];
 
         $sorts = [
-            '최근 등록 순' => 'recent',
-            '낮은 가격 순' => 'price_asc',
-            '높은 가격 순' => 'price_desc',
-            '상품명 순' => 'prds_nm_asc'
+            'recent' => '최근 등록 순',
+            'price_asc' => '낮은 가격 순',
+            'price_desc' => '높은 가격 순',
+            'prds_nm_asc' => '상품명 순'
         ];
 
         $prds_status = [
-            '판매중' => 'selling',
-            '판매중지' => 'stop_selling',
-            '일시품절' => 'sold_out'
-        ];
-
-        $prds_theads = [
-            '상품번호',
-            '상품명',
-            '가격',
-            '할인가',
-            '재고',
-            '브랜드',
-            '카테고리',
-            '등록자',
-            '등록일',
-            '상태',
-            '상품삭제',
+            'selling' => '판매중',
+            'stop_selling' => '판매중지',
+            'sold_out' => '일시품절'
         ];
 
 
         return view('products.index')->with([
             'products' => $products,
-            'parms' => $parms,
+            'parameters' => $parameters,
             'search_types' => $search_types,
             'sorts' => $sorts,
-            'prds_theads' => $prds_theads,
-            'prds_status' => $prds_status
+            'prds_status' => $prds_status,
         ]);
     }
 
