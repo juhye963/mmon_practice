@@ -57,6 +57,7 @@ class ProductsController extends Controller
 
     public function index(Request $request)
     {
+        //dd(asset(Storage::url('12.png')));
         $products = Product::with('brand','category','seller');
 
         $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');

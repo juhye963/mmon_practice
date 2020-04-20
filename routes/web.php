@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 
 /*메인화면*/
 
-Route::get('/',[
+Route::get('/', [
     'as' => 'home',
     'uses' => 'HomeController@index'
 ]);
@@ -78,13 +78,13 @@ Route::post('/products/store', [
 ]);*/
 
 /*상품 display*/
-Route::get('/products/index',[
+Route::get('/products/index', [
     'as' => 'products.index',
     'uses' => 'ProductsController@index'
 ]);
 
 /*상품 삭제*/
-Route::get('/products/destroy/{product_id}',[
+Route::get('/products/destroy/{product_id}', [
     'as' => 'products.destroy',
     'uses' => 'ProductsController@destroy'
 ]);
@@ -94,6 +94,11 @@ Route::get('/products/destroy/{product_id}',[
     'as' => 'products.search',
     'uses' => 'ProductsController@search'
 ]);*/
+
+/*상품 이미지 보기 테스트*/
+Route::get('/products/image', function(){
+    redirect(storage_path('app/public/product_image/12.png'));
+});
 
 
 
