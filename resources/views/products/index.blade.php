@@ -3,8 +3,13 @@
 @section('style')
     <style>
         div {padding: 20px}
-        label {}
     </style>
+@endsection
+
+@section('script')
+    <script>
+        
+    </script>
 @endsection
 
 @section('content')
@@ -21,6 +26,7 @@
         <legend>검색</legend>
         <label for="searchTypeSelect">검색조건</label>
         <select class="form-control" name="search_type" id="searchTypeSelect">
+            <option value="" ></option>
             @foreach($search_types as $key => $value)
                 <option value="{{ $key }}" {{ $key != $parameters['search_type'] ? '' : 'selected' }}>{{ $value }}</option>
             @endforeach
@@ -50,10 +56,7 @@
         @foreach($prds_status as $display_prds_status_key => $display_prds_status_value)
             {{ $display_prds_status_value }}
             <input type="checkbox" name="prds_status[]" value="{{ $display_prds_status_key }}"
-            @foreach($parameters['prds_status'] as $input_prds_status_value)
-                {{ $display_prds_status_key != $input_prds_status_value ? '' : 'checked'}}
-                @endforeach
-            >
+            {{ in_array($display_prds_status_key, $parameters['prds_status']) !== false ? 'checked' : '' }} />
         @endforeach
     </div>
     <button type="submit" class="btn btn-outline-success float-right">Search</button>
@@ -75,14 +78,17 @@
             <th>등록일</th>
             <th>상태</th>
             <th>상품삭제</th>
+            <th>상품수정</th>
         </tr>
     </thead>
     @foreach($products as $product)
         <tr>
-            <td>{{ $product->id }}</td>
-            <td><button type="button" class="btn btn-light" data-toggle="modal" data-target="#productImage">{{ $product->name }}</button></td>
-
-            <div class="modal fade" id="productImage" tabindex="-1" role="dialog" aria-hidden="true">
+            <td>
+                {{ $product->id }}
+                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productMultiDelete[]" value="{{ $product->id }}" />
+            </td>
+            <td><button type="button" class="btn btn-light" data-toggle="modal" data-target="#productImage{{ $product->id }}">{{ $product->name }}</button></td>
+            <div class="modal fade" id="productImage{{ $product->id }}" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -92,25 +98,26 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <img src="{{ asset(Storage::url('product_image/'.$product->id.'.png')) }}" class="img-thumbnail">
+                            <img src="{{ $product->product_image_path }}" class="img-thumbnail">
                         </div>
                     </div>
                 </div>
             </div>
-
             <td>{{ $product->price }} 원</td>
             <td>{{ $product->discounted_price}} 원</td>
-            <td>{{ $product->amount }}</td>
+            <td>{{ $product->stock }}</td>
             <td>{{ $product->brand->name }}</td>
             <td>{{ $product->category->name }}</td>
             <td>{{ $product->seller->name }}</td>
             <td>{{ $product->created_at }}</td>
             <td>{{ $product->status }}</td>
-            <td><a class="btn btn-light" href="{{ route('products.destroy',['product_id' => $product->id]) }}" role="button">삭제</a></td>
+            <td><a class="btn btn-light" role="button" onclick="deleteProduct({{ $product->id }})">삭제</a></td>
+            <td><a class="btn btn-light" href="{{ route('products.edit', ['product_id' => $product->id]) }}" role="button">수정</a></td>
         </tr>
     @endforeach
 </table>
 
+<button class="btn btn-dark" role="button" id="multiDelete">일괄삭제</button>
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}

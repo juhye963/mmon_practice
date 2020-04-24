@@ -3,13 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
     protected $table = 'mall_products';
 
     protected $fillable = [
-        'name', 'filename', 'price', 'discount', 'amount', 'seller_id', 'brand_id', 'category_id'
+        'name', 'filename', 'price', 'discount', 'stock', 'seller_id', 'brand_id', 'category_id'
     ];
 
     public function category()
@@ -25,5 +26,15 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+    /*public function getProductImageNameAttribute()
+    {
+        return "{ $this->id }.png";
+    }*/
+
+    public function getProductImagePathAttribute()
+    {
+        return asset(Storage::url('product_image/'.$this->id.'.png'));
     }
 }

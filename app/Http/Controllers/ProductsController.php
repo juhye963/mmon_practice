@@ -7,144 +7,98 @@ use App\Category;
 use App\Product;
 use App\Seller;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+//use Illuminate\Support\Facades\DB;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Whoops\Exception\ErrorException;
 
 class ProductsController extends Controller
 {
     public function create()
     {
-        $categories = Category::all();
+        //상품등록폼은 로그인상태에서만 올 수 있도록
+        //공식문서 : 현재 사용자의 승인 여부 결정하기
+        //https://laravel.kr/docs/6.x/authentication#protecting-routes
 
-        return view('products.create', ['categories' => $categories]);
+        //나중에 여기에서 또쓰지 말고 카테고리컨트롤러와 공유할 수 있도록 바꾸기.. how? 생각
+        $categories = Category::where('pid', '=', '0')->get();
+        $product_status = [
+            'selling' => '판매중',
+            'stop_selling' => '판매중지',
+            'sold_out' => '일시품절'
+        ];
+        //상품상태는 나중에 @index에 있는 것과 공유하기
+
+        return view('products.create')->with([
+            'categories' => $categories,
+            'product_status' => $product_status
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'price' => 'required|min:1|max:1000000',
-            'discounted_price' => 'required|min:1|max:1000000|lte:price',
-            'amount' => 'required|min:0|max:1000',
-            'category_id' => 'required|exists:mall_categories,id'
+        $validatedData = $request->validate([
+            'product_name' => 'required|max:255',
+            'product_price' => 'required|digits_between:1,1000000',
+            'product_discounted_price' => 'required|digits_between:1,1000000|lte:product_price',
+            'product_stock' => 'required|min:0|max:1000',
+            'category_pid' => 'required:sub_category_id|exists:mall_categories,id',
+            'sub_category_id' => 'required_with:category_pid|exists:mall_categories,id',
+            'product_status' => [
+                'required',
+                Rule::in(['selling', 'stop_selling', 'sold_out']),
+            ],
+            'product_image' => 'file|image'
         ]);
-
-        //required 오타나면 나오는 에러
-        // Method Illuminate\Validation\Validator::validateRequire does not exist.
 
         $product = new Product();
 
-        $product->name = $request->name;
-        $product->price = $request->price;
-        $product->discounted_price = $request->discounted_price;
-        $product->amount = $request->amount;
-        $product->seller_id = auth()->user()->id;
-        $product->brand_id = auth()->user()->brand_id;
-        $product->category_id = $request->category_id;
+        try {
+            $product->name = $request->product_name;
+            $product->price = $request->product_price;
+            $product->discounted_price = $request->product_discounted_price;
+            $product->stock = $request->product_stock;
+            $product->seller_id = auth()->user()->id;
+            $product->brand_id = auth()->user()->brand_id;
+            $product->category_id = $request->sub_category_id;
+            $product->status = $request->product_status;
 
-        $product->save();
+            $product->save();
 
-        if($request->hasFile('product_image')){
-            $path = $request->file('product_image')->storeAs('public/product_image', $product->id.'.png');
+            if ($request->hasFile('product_image')) {
+                $path = $request->file('product_image')->storeAs('public/product_image', $product->id.'.png');
+            }
+
+            $success_fail_status = 'success' ; //이것들 나중에 상수로 정의?
+
+        } catch (QueryException $queryException) {
+            $success_fail_status = 'query_fail';
+            //use Illuminate\Database\QueryException; 쓰지 않으면 여기에 걸리지 않음
         }
-        //Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).
-        //php.ini 에서 해당 extension enable 하면 해결됨
-        // storage/app/public 에 저장됨
+        //어느 예외가 더 큰건지 찾아보기(laravel api문서?)
+        //두 예외가 모두 일어나는 상황에서 ErrorException이 먼저 걸림 = 이게 더 작은가?
+        //auth middleware로 접근 막아서 비로그인 상태에서 나는 ErrorException 예외 안뜨도록 하고 캐치하지 않는걸로 바꿈
 
-        return redirect(route('home'));
+        return response()->json([
+            'success_fail_status' => $success_fail_status
+        ]);
+
     }
 
     public function index(Request $request)
     {
-        //dd(asset(Storage::url('12.png')));
-        $products = Product::with('brand','category','seller');
-
-        $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
-
-        $parameters['search_type'] = $request->input('search_type', '');
-        $parameters['search_word'] = $request->input('search_word', '');
-        $parameters['sort'] = $request->input('sort', '');
-        $parameters['prds_status'] = $request->input('prds_status', []); // 상품상태는 배열로 들어옴
-        $parameters['start_date'] = $request->input('start_date', '');
-        $parameters['end_date'] = $request->input('end_date', '');
-
-        /*validation*/
-        //검색어 있을때는 검색유형 필수
-        if ($parameters['search_word'] != '') {
-            $request->validate([
-                'search_type' => 'required'
-                //exists 이용하든 뭘하든 내가 설정한 검색유형중에 있는 값인지 확인하기
-            ]);
-        }
-
-        //현재보다 미래의 날짜는 입력할 수 없음 (날짜 찍히는거 보고 잘 비교하기)
-        //날짜 한쪽이 입력되면 다른 한쪽도 필요함
-        if ($parameters['start_date'] != '' || $parameters['end_date'] != '') {
-            $request->validate([
-                'start_date' => 'required',
-                'end_date' => 'required'
-            ]);
-        }
-
-        /*조건적용*/
-        //검색키워드로 찾기
-        //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
-        if ($parameters['search_type'] == 'prds_nm') {
-            //더 좋은 방법 있을듯(계속 생각해보기)
-            $products = $products->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
-        } elseif ($parameters['search_type'] == 'seller' || $parameters['search_type'] == 'brand') {
-            $products = $products->whereHas($parameters['search_type'], function (Builder $query) use ($parameters) {
-                $query->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
-            });
-        }
-
-        //체크박스!!
-        if ($parameters['prds_status'] != []) {
-            //dd(count($parameters['prds_status']));
-            $products = $products->whereIn('status', $parameters['prds_status']);
-        }
-
-        //날짜검색 있을때
-        // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
-        if ($parameters['start_date'] != '' && $parameters['end_date'] != '' ) {
-            $end_date = date('Y-m-d', strtotime("+1 days", strtotime($parameters['end_date'])));
-            // 종료일 포함시키지 않는 문제 해결
-            //dd ($parameters['end_date']);
-            $products = $products->whereBetween('created_at', [$parameters['start_date'], $end_date]);
-            //종료일은 포함되지 않음. 16일이 종료일이면 16일 상품은 안나옴
-        }
-
-        //정렬조건 붙이기
-        if ($parameters['sort'] != '') {
-            switch ( $parameters['sort'] ) {
-                case 'recent':
-                    $products = $products->orderByDesc('updated_at');
-                    break;
-                case 'price_asc' :
-                    $products = $products->orderBy('price');
-                    break;
-                case 'price_desc' :
-                    $products = $products->orderByDesc('price');
-                    break;
-                case 'prds_name':
-                    $products = $products->orderBy('name');
-                    break;
-                /*default :
-                    $products = $products->orderByDesc('id');
-                    break;*/
-            }
-        } else {
-            $products = $products->orderByDesc('id');
-        }
-
-        $products = $products->paginate(5);
-
-        /*화면출력에 필요한 변수 설정*/
+        /* view 에 필요한 변수 설정 */
         $search_types = [
             'prds_nm' => '상품명',
-            'seller' => '판매자 이름',
-            'brand' => '브랜드명'
+            'seller_nm' => '판매자 이름',
+            'brand_nm' => '브랜드명'
         ];
 
         $sorts = [
@@ -161,6 +115,96 @@ class ProductsController extends Controller
         ];
 
 
+        //dd(asset(Storage::url('12.png')));
+        $products = Product::with('brand','category','seller');
+
+        $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
+
+        $parameters['search_type'] = $request->input('search_type', '');
+        $parameters['search_word'] = $request->input('search_word', '');
+        $parameters['sort'] = $request->input('sort', '');
+        $parameters['prds_status'] = $request->input('prds_status', []); // 상품상태는 배열로 들어옴
+        $parameters['start_date'] = $request->input('start_date', '');
+        $parameters['end_date'] = $request->input('end_date', '');
+
+        /*validation*/
+        //검색어 있을때는 검색유형 필수
+        $request->validate([
+           'search_type' => [
+               'required_with:search_word',
+                Rule::in(['prds_nm', 'seller_nm', 'brand_nm', '']),
+           ],
+        ]);
+
+        //현재보다 미래의 날짜는 입력할 수 없음 (날짜 찍히는거 보고 잘 비교하기)
+        //날짜 한쪽이 입력되면 다른 한쪽도 필요함
+        if ($parameters['start_date'] != '' || $parameters['end_date'] != '') {
+            $request->validate([
+                'start_date' => 'required|date|before_or_equal:end_date',
+                'end_date' => 'required|date|before_or_equal:today',
+
+            ]);
+        }
+
+        /*조건적용*/
+        //검색키워드로 찾기
+        //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
+        if ($parameters['search_type'] == 'prds_nm') {
+            //더 좋은 방법 있을듯(계속 생각해보기)
+            $products = $products->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+        } elseif ($parameters['search_type'] == 'seller_nm') {
+            $products = $products->whereHas('seller', function (Builder $query) use ($parameters) {
+                $query->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+            });
+        } elseif ($parameters['search_type'] == 'brand_nm') {
+            $products = $products->whereHas('brand', function (Builder $query) use ($parameters) {
+                $query->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+            });
+        }else {
+            $products = $products;
+        }
+
+        //체크박스!!
+        if ($parameters['prds_status'] != []) {
+            //dd(count($parameters['prds_status']));
+            $products = $products->whereIn('status', $parameters['prds_status']);
+        }
+
+        //like %%빼기
+
+        //날짜검색 있을때
+        // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
+        if ($parameters['start_date'] != '' && $parameters['end_date'] != '' ) {
+            $start_date = date('Y-m-d H:i:s', strtotime($parameters['start_date']));
+            //dd($start_date);
+            $end_date = date('Y-m-d H:i:s', strtotime("+1 days -1 second", strtotime($parameters['end_date'])));
+            //dd($end_date);
+            //23:59:59 종료일 포함시키지 않는 문제 해결
+            //dd ($parameters['end_date']);
+            $products = $products->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        //정렬조건 붙이기
+        switch ($parameters['sort']) {
+            case 'recent':
+                $products = $products->orderByDesc('updated_at');
+                break;
+            case 'price_asc' :
+                $products = $products->orderBy('price');
+                break;
+            case 'price_desc' :
+                $products = $products->orderByDesc('price');
+                break;
+            case 'prds_name':
+                $products = $products->orderBy('name');
+                break;
+            default :
+                $products = $products->orderByDesc('id');
+                break;
+        }
+
+        $products = $products->paginate(5);
+
         return view('products.index')->with([
             'products' => $products,
             'parameters' => $parameters,
@@ -168,6 +212,95 @@ class ProductsController extends Controller
             'sorts' => $sorts,
             'prds_status' => $prds_status,
         ]);
+    }
+
+    public function edit($product_id) {
+
+        //dd($product_id);
+        $current_seller_id = auth()->user()->id;
+        $product = Product::find($product_id);
+        if ($product == null) {
+            return redirect()->route('products.index')->withErrors(['잘못된 접근입니다.']);
+        }
+        $product_seller_id = $product->seller->id;
+
+        if ($current_seller_id != $product_seller_id) {
+            return Redirect::back()->withErrors(['수정권한이 없습니다.']);
+            // 리다이렉트 후에 $errors 변수가 자동으로 뷰에서 공유되어 손쉽게 사용자에게 보여질 수 있습니다.
+            // withErrors 메소드는 validator, MessageBag, 혹은 PHP array 를 전달 받습니다.
+        }
+
+
+        //dd($product->name);
+
+        $categories = Category::where('pid', '=', '0')->get();
+        $product_status = [
+            'selling' => '판매중',
+            'stop_selling' => '판매중지',
+            'sold_out' => '일시품절'
+        ];
+
+        return view('products.edit')->with([
+            'categories' => $categories,
+            'product_status' => $product_status,
+            'product' => $product
+        ]);
+    }
+
+    public function update(Request $request) {
+
+        //dd($request->product_id);
+        //dd($request->product_image instanceof UploadedFile); //undefined or  Illuminate\Http\UploadedFile
+        $validatedData = $request->validate([
+            'product_name' => 'required|max:255',
+            'product_price' => 'required|digits_between:1,1000000',
+            'product_discounted_price' => 'required|digits_between:1,1000000|lte:product_price',
+            'product_stock' => 'required|min:0|max:1000',
+            'category_pid' => 'required:sub_category_id|exists:mall_categories,id',
+            'sub_category_id' => 'required_with:category_pid|exists:mall_categories,id',
+            'product_status' => [
+                'required',
+                Rule::in(['selling', 'stop_selling', 'sold_out']),
+            ],
+        ]);
+
+        if ($request->product_image instanceof UploadedFile) {
+            $request->validate([
+                'product_image' => 'file|image'
+            ]);
+        }
+
+        $product_to_be_updated = Product::find($request->product_id);
+        try {
+            $product_to_be_updated->name = $request->product_name;
+            $product_to_be_updated->price = $request->product_price;
+            $product_to_be_updated->discounted_price = $request->product_discounted_price;
+            $product_to_be_updated->stock = $request->product_stock;
+            $product_to_be_updated->seller_id = auth()->user()->id;
+            $product_to_be_updated->brand_id = auth()->user()->brand_id;
+            $product_to_be_updated->category_id = $request->sub_category_id;
+            $product_to_be_updated->status = $request->product_status;
+
+            $product_to_be_updated->save();
+
+            if ($request->product_image instanceof UploadedFile) {
+                $request->file('product_image')->storeAs('public/product_image', $request->product_id.'.png');
+                Cache::flush(); // update 한 새로운 이미지 가져오기 위해 캐시 삭제
+                //php artisan config:cache 필요
+            }
+
+            $success_fail_status = 'success' ; //이것들 나중에 상수로 정의?
+
+        } catch (QueryException $queryException) {
+            $success_fail_status = 'query_fail';
+            //use Illuminate\Database\QueryException; 쓰지 않으면 여기에 걸리지 않음
+        }
+
+        return response()->json([
+            'success_fail_status' => $success_fail_status
+        ]);
+
+
     }
 
     public function destroy($product_id)
@@ -180,8 +313,6 @@ class ProductsController extends Controller
             $product->delete();
         } else {
             session()->flash('상품을 삭제할 권한이 없습니다.',false);
-            //나중에는 삭제권한없으면 버튼 보이지도 않게 바꾸기
-            //return '삭제권한 없다고.. 왜 플래시 안뜨냐고ㅠㅠㅠ';
         }
 
         return redirect(route('products.index'));

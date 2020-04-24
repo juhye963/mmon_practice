@@ -2,10 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="34ecdf39-dff1-4b5b-84d6-393b0fc1f50c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/board-test.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/board-test.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Category.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CategoriesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CategoriesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SellersController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SellersController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/Authenticate.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/Authenticate.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Product.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/brands/select.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/brands/select.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/categories/select.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/categories/select.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layouts/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/products/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/products/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/products/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/products/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/sellers/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/sellers/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -126,6 +140,10 @@
       <path value="$PROJECT_DIR$/vendor/maximebf/debugbar" />
       <path value="$PROJECT_DIR$/vendor/league/commonmark" />
       <path value="$PROJECT_DIR$/vendor/laravel/ui" />
+      <path value="$PROJECT_DIR$/vendor/laracasts/flash" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/event-manager" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/dbal" />
     </include_path>
   </component>
   <component name="ProjectId" id="1a9ckx187rUUv2hZdzPsb3tX2ys" />
@@ -139,6 +157,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2019.3.4\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -175,7 +194,11 @@
       <workItem from="1586821783706" duration="26566000" />
       <workItem from="1586994567010" duration="27672000" />
       <workItem from="1587080986679" duration="27414000" />
-      <workItem from="1587340817566" duration="14099000" />
+      <workItem from="1587340817566" duration="32726000" />
+      <workItem from="1587428114658" duration="23593000" />
+      <workItem from="1587513454543" duration="31071000" />
+      <workItem from="1587599387139" duration="28205000" />
+      <workItem from="1587686082459" duration="27806000" />
     </task>
     <servers />
   </component>
@@ -196,10 +219,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="552" y="178" key="#Inspections" timestamp="1586765334775">
+    <state x="552" y="178" key="#Inspections" timestamp="1587687487046">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="178" key="#Inspections/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586765334775" />
+    <state x="552" y="178" key="#Inspections/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587687487046" />
     <state x="2610" y="322" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1586396281611">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
@@ -224,20 +247,28 @@
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="2601" y="261" width="573" height="524" key="StructurePopup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586312542898" />
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1587340825800">
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1587686093121">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587340825800" />
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587686093121" />
     <state x="2572" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586739891954" />
-    <state x="647" y="127" width="745" height="807" key="find.popup" timestamp="1587113379684">
+    <state x="1997" y="70" width="1597" height="888" key="dock-window-1" timestamp="1587711201578">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1997" y="70" width="1597" height="888" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587711201578" />
+    <state x="647" y="127" width="745" height="807" key="find.popup" timestamp="1587713230875">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="647" y="127" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587113379684" />
+    <state x="647" y="127" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587713230875" />
     <state x="2574" y="117" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586747675373" />
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1587341420542">
+    <state x="616" y="240" key="run.anything.popup" timestamp="1587364982024">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587341420542" />
+    <state x="616" y="240" key="run.anything.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587364982024" />
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1587707738127">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1587707738127" />
     <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586495982909" />
   </component>
   <component name="XDebuggerManager">

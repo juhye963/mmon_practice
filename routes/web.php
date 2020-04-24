@@ -25,6 +25,13 @@ Route::get('/register', [
     'uses' => 'SellersController@create'
 ]);
 
+/*이메일이 아이디처럼 쓰이고 있음.
+아이디중복체크 대신 이메일 중복체크*/
+Route::get('/sellers/check-if-email-has-been-taken', [
+    'as' => 'sellers.check-if-email-has-been-taken',
+    'uses' => 'SellersController@emailDuplicateCheck'
+]);
+
 Route::post('/register', [
     'as' => 'sellers.store',
     'uses' => 'SellersController@store'
@@ -66,16 +73,12 @@ Route::post('/seller/brands/update', [
 Route::get('/products/create', [
     'as' => 'products.create',
     'uses' => 'ProductsController@create'
-]);
+])->middleware('auth');
+
 Route::post('/products/store', [
     'as' => 'products.store',
     'uses' => 'ProductsController@store'
-]);
-//카테고리 정보 test 페이지
-/*Route::get('/categories',[
-    'as' => 'categories',
-    'uses' => 'CategoriesController@index'
-]);*/
+])->middleware('auth');
 
 /*상품 display*/
 Route::get('/products/index', [
@@ -83,22 +86,42 @@ Route::get('/products/index', [
     'uses' => 'ProductsController@index'
 ]);
 
-/*상품 삭제*/
-Route::get('/products/destroy/{product_id}', [
+Route::post('/products/image-upload', [
+    'as' => 'products.image-upload',
+    'uses' => 'ProductsController@imageUpload'
+]);
+
+/* 상품 삭제(삭제버튼도 get아니라 delete되도록) */
+Route::delete('/products/destroy/{product_id}', [
     'as' => 'products.destroy',
     'uses' => 'ProductsController@destroy'
 ]);
 
-/*상품 검색*/
-/*Route::get('/products/search/{seller?}',[
-    'as' => 'products.search',
-    'uses' => 'ProductsController@search'
-]);*/
+/* 상품 수정 */
+Route::get('/products/edit/{product_id}', [
+    'as' => 'products.edit',
+    'uses' => 'ProductsController@edit'
+]);
 
-/*상품 이미지 보기 테스트*/
-Route::get('/products/image', function(){
-    redirect(storage_path('app/public/product_image/12.png'));
-});
+Route::post('/products/update', [
+    'as' => 'products.update',
+    'uses' => 'ProductsController@update'
+]);
+
+
+/*카테고리*/
+Route::get('/categories/select',[
+    'as' => 'categories',
+    'uses' => 'CategoriesController@select'
+]);
+
+Route::get('/categories/display-sub-categories',[
+    'as' => 'categories.display-sub-categories',
+    'uses' => 'CategoriesController@displaySubCategories'
+]);
+
+
+
 
 
 

@@ -1,19 +1,65 @@
-<h1>이곳은 상품등록폼입니다.</h1>
 
-<form action="{{ route('products.store') }}" method="post" enctype="multipart/form-data">
-    @csrf
+@extends('layouts.master')
 
-    @include('errors.validate')
+@section('script')
+    @parent
+    {{-- 부모컨텐츠를 겹쳐 쓰지 않고 추가합니다 --}}
+    {{-- include한 곳에서도 써야함 --}}
+    <script type="text/javascript">
+        function registerProduct () {
 
-    <input type="text" name="name" placeholder="상품명" value="{{ old('name') }}" autofocus><br>
-    <input type="file" name="product_image"><br>
-    <input type="number" name="price" placeholder="상품가격" value="{{ old('price') }}" min="1" max="1000000"> 원<br>
-    <input type="number" name="discounted_price" placeholder="할인가" value="{{ old('discounted_price') }}" min="1" max="1000000"> 원<br>
-    <input type="number" name="amount" placeholder="재고" value="{{ old('amount') }}" min="1" max="1000"> 개<br>
+            var productRegisterFormData = createFormData();
 
-    @include('categories.select')
+            axios({
+                method: 'post',
+                url: '{{ route("products.store") }}',
+                data: productRegisterFormData,
+                headers: { 'content-type': 'multipart/form-data' },
+                // processData: false
+            })
+            .then(function (response) {
+                if (response.data.success_fail_status && response.data.success_fail_status == 'success') {
+                    alert('상품 등록 성공');
+                    window.location = '{{ route('products.index') }}';
+                } else if (response.data.success_fail_status && response.data.success_fail_status == 'query_fail') {
+                    alert('상품 DB 등록 실패');
+                    //history.go(-1);
+                } else {
+                    console.log(response);
+                }
+            })
+            .catch(function (error) {
+                if (error.response && error.response.status === 422) {
+                    alert(Object.values(error.response.data.errors)[0]);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log(error.message);
+                }
+            })
+            .finally(function () {
+                console.log('product in axios!');
+            })
+        }
 
-    <br>
-    <button type="submit">상품등록</button>
+    </script>
+@endsection
 
-</form>
+@section('content')
+
+<h3>상품등록</h3>
+
+@include('products.form', [
+    'product_name' => old('name'),
+    'product_price' => old('price'),
+    'product_discounted_price' => old('discounted_price'),
+    'product_stock' => old('stock'),
+    'product_status' => $product_status,
+    'product_parent_category_id' => '',
+    'product_sub_category_id' => '',
+    'product_status_value' => ''
+])
+
+<button type="submit" onclick="registerProduct()">상품등록</button>
+
+@endsection
