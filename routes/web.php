@@ -92,10 +92,16 @@ Route::post('/products/image-upload', [
 ]);
 
 /* 상품 삭제(삭제버튼도 get아니라 delete되도록) */
-Route::delete('/products/destroy/{product_id}', [
+/*Route::delete('/products/destroy/{product_id}', [
+    'as' => 'products.destroy',
+    'uses' => 'ProductsController@destroy'
+]);*/
+//다중삭제하려면 뒤에 아이디 있으면 불편?
+Route::delete('/products/destroy', [
     'as' => 'products.destroy',
     'uses' => 'ProductsController@destroy'
 ]);
+
 
 /* 상품 수정 */
 Route::get('/products/edit/{product_id}', [

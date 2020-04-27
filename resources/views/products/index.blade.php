@@ -8,7 +8,51 @@
 
 @section('script')
     <script>
-        
+
+        function deleteProduct(product_id) {
+            console.log(product_id);
+        }
+
+        function multiDelete() {
+            var deleteCheckbox = document.getElementsByName('productMultiDelete[]');
+            var checkedValues = [];
+            //console.log(deleteCheckbox.length);
+            //console.log(deleteCheckbox[0].checked);
+            for (let i = 0; i < deleteCheckbox.length; i++) {
+                if (deleteCheckbox[i].checked) {
+                    //checkedValues += "," + deleteCheckbox[i].value;
+                    checkedValues.push(deleteCheckbox[i].value);
+                } else {
+                    continue;
+                }
+            }
+
+            axios.delete('{{ route('products.destroy') }}', {
+                data: {
+                    deletedProduct: checkedValues
+                }
+            })
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.success_fail_status == false) {
+                        alert('상품 삭제 실패! 자신의 상품이 맞는지 확인해주세요');
+                    } else if (response.data.success_fail_status == true) {
+                        alert('상품 삭제 성공.');
+                        //window.location.reload();
+                    } else {
+                        /*alert('잘못된 접근입니다.');
+                        window.location.href = '{{ route('home') }}';*/
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
+                .finally(function () {
+                    console.log('done');
+                })
+
+        }
+
     </script>
 @endsection
 
@@ -18,6 +62,15 @@
 <p>총 {{ $products->total() }} 개의 상품이 조회되었습니다.</p>
 
 @include('errors.validate')
+
+{{--@if (\Session::has('success'))
+    <div class="alert alert-success">
+        <ul>
+            <li>{!! \Session::get('success') !!}</li>
+        </ul>
+    </div>
+@endif--}}
+
 
 <a class="btn btn-dark" data-toggle="collapse" href="#collapseSearchForm">검색하기</a>
 <div class="collapse" id="collapseSearchForm">
@@ -85,7 +138,7 @@
         <tr>
             <td>
                 {{ $product->id }}
-                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productMultiDelete[]" value="{{ $product->id }}" />
+                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productMultiDelete[]" value="{{ $product->id }}" multiple />
             </td>
             <td><button type="button" class="btn btn-light" data-toggle="modal" data-target="#productImage{{ $product->id }}">{{ $product->name }}</button></td>
             <div class="modal fade" id="productImage{{ $product->id }}" tabindex="-1" role="dialog" aria-hidden="true">
@@ -117,7 +170,7 @@
     @endforeach
 </table>
 
-<button class="btn btn-dark" role="button" id="multiDelete">일괄삭제</button>
+<button class="btn btn-dark" role="button" id="multiDelete" onclick="multiDelete()">일괄삭제</button>
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}

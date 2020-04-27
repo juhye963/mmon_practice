@@ -6,6 +6,7 @@ use App\Brand;
 use App\Category;
 use App\Product;
 use App\Seller;
+use http\Env\Response;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Whoops\Exception\ErrorException;
+use function Couchbase\defaultDecoder;
 
 class ProductsController extends Controller
 {
@@ -303,20 +305,40 @@ class ProductsController extends Controller
 
     }
 
-    public function destroy($product_id)
+    public function destroy(Request $request)
     {
+        // Validation
+
+        $deleteProductId = $request->input('deletedProduct','');
+
+
+
+        // Define & Request
+
+        // DataSet
+
+        // Return
+
+        $products = Product::whereIn('id', $request->input('deletedProduct'));
+
         $current_seller_id = auth()->user()->id;
-        $product = Product::find($product_id);
-        $product_seller_id = $product->seller->id;
+        $id_match = $products->where('seller_id', '!=', $current_seller_id)->get();
 
-        if ($current_seller_id == $product_seller_id) {
-            $product->delete();
-        } else {
-            session()->flash('상품을 삭제할 권한이 없습니다.',false);
-        }
+        $products->delete();
 
-        return redirect(route('products.index'));
-        //https://laravel.kr/docs/6.x/controllers#defining-controllers 참고
+//        if ($id_match->isEmpty()) {
+//            $products->delete();
+//            //return view('products.index')->with('success', ['상품 삭제가 완료되었습니다.']);
+//            return response()->json([
+//                'success_fail_status' => true
+//            ]);
+//        } elseif (!$id_match->isEmpty()) {
+//            //return redirect()->back()->with('error', ['자신의 상품만 삭제 가능']);
+//            return response()->json([
+//                'success_fail_status' => false
+//            ]);
+//        }
+
     }
 
 }

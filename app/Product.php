@@ -3,10 +3,13 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'mall_products';
 
     protected $fillable = [
