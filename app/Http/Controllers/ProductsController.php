@@ -274,17 +274,19 @@ class ProductsController extends Controller
 
         $product_to_be_updated = Product::find($request->product_id);
         try {
+            //좀 더 확실하게 input('이름')으로 -> 아래처럼하면 값 이미 있을수도 있음
             $product_to_be_updated->name = $request->product_name;
             $product_to_be_updated->price = $request->product_price;
             $product_to_be_updated->discounted_price = $request->product_discounted_price;
             $product_to_be_updated->stock = $request->product_stock;
-            $product_to_be_updated->seller_id = auth()->user()->id;
+            $product_to_be_updated->seller_id = auth()->user()->id; //필요없지않아?
             $product_to_be_updated->brand_id = auth()->user()->brand_id;
             $product_to_be_updated->category_id = $request->sub_category_id;
             $product_to_be_updated->status = $request->product_status;
 
             $product_to_be_updated->save();
 
+            //여기 hasFile, validFile 말고 이거 쓴 이유 다시 생각해보기
             if ($request->product_image instanceof UploadedFile) {
                 $request->file('product_image')->storeAs('public/product_image', $request->product_id.'.png');
                 Cache::flush(); // update 한 새로운 이미지 가져오기 위해 캐시 삭제
@@ -305,10 +307,12 @@ class ProductsController extends Controller
 
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request, string $product_id)
     {
-        // Validation
+        // Validation\
+        return response()->json($product_id, 400);
 
+        dd ($request->input('productIdsForDeletion'));
         $deleteProductId = $request->input('deletedProduct','');
 
 
@@ -326,18 +330,21 @@ class ProductsController extends Controller
 
         $products->delete();
 
-//        if ($id_match->isEmpty()) {
-//            $products->delete();
-//            //return view('products.index')->with('success', ['상품 삭제가 완료되었습니다.']);
-//            return response()->json([
-//                'success_fail_status' => true
-//            ]);
-//        } elseif (!$id_match->isEmpty()) {
-//            //return redirect()->back()->with('error', ['자신의 상품만 삭제 가능']);
-//            return response()->json([
-//                'success_fail_status' => false
-//            ]);
-//        }
+        //try catch로 (저쪽에서 then 에 안걸리게) -> throws new Exception
+        //함수에 리턴 하나일필요 없음
+        //실패를 예외로 처리 = 간단해짐
+        if ($id_match->isEmpty()) {
+            $products->delete();
+            //return view('products.index')->with('success', ['상품 삭제가 완료되었습니다.']);
+            return response()->json([
+                'success_fail_status' => true
+            ]);
+        } else {
+            //return redirect()->back()->with('error', ['자신의 상품만 삭제 가능']);
+            return response()->json([
+                'success_fail_status' => false
+            ]);
+        }
 
     }
 

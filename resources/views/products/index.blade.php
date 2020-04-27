@@ -8,41 +8,63 @@
 
 @section('script')
     <script>
+        document.querySelector('.btn.btn-light.btn_remove').addEventListener('click', deleteThis);
 
-        function deleteProduct(product_id) {
-            console.log(product_id);
+        function deleteThis(_event) {
+            _event.preventDefault();
+            console.log(this.dataset.deleteUrl);
         }
 
-        function multiDelete() {
-            var deleteCheckbox = document.getElementsByName('productMultiDelete[]');
-            var checkedValues = [];
-            //console.log(deleteCheckbox.length);
-            //console.log(deleteCheckbox[0].checked);
-            for (let i = 0; i < deleteCheckbox.length; i++) {
-                if (deleteCheckbox[i].checked) {
+        function checkThisProductAndDelete(productId) {
+            //console.log(productId);
+            var checkboxElementId = 'multiDelete'+productId;
+            var productIdToCheck =  document.getElementById(checkboxElementId);
+            productIdToCheck.checked = true;
+            //console.log(document.getElementsByName('productsDelete[]')[0].checked);
+
+            deleteProducts();
+        }
+
+        function deleteProducts() {
+            var productCheckboxForDeletion = document.getElementsByName('productsDelete[]');
+            var checkedProductIdsForDeletion = [];
+            for (let i = 0; i < productCheckboxForDeletion.length; i++) {
+                if (productCheckboxForDeletion[i].checked) {
                     //checkedValues += "," + deleteCheckbox[i].value;
-                    checkedValues.push(deleteCheckbox[i].value);
-                } else {
-                    continue;
+                    checkedProductIdsForDeletion.push(productCheckboxForDeletion[i].value);
                 }
             }
 
-            axios.delete('{{ route('products.destroy') }}', {
+            var deleteUrl = '{!! json_encode(url("/products/delete")) !!}'; //이스케이프 안하면 &quot 으로 보간되어나옴
+            var deleteParams = jQuery.param({"product_id":checkedProductIdsForDeletion});
+
+            var url = "http://board-test.localhost/products/delete" + "숫자"
+            console.log(deleteParams);
+
+            // 1. "http://board-test.localhost/products/delete" + "숫자"
+            // 2. "http://board-test.localhost/products/delete/#pid#"
+            // 3. 라우트 자체를 변경(라우트 파라미터 없앰)
+            // 4. 라우트 자체를 변경(라우트 파라미터를 optional 처리)
+            // 5.
+            //
+            // http://                                                                         --protocol
+            //     board-test.localhost                                                        -- host
+            //     /products/destory/                                              --path
+            //     ?
+            //     search_type=prds_nm&search_word=&sort=recent&start_date=&end_date=         --query string
+            //     #ssasd                                                                      --hashtag
+
+
+
+/*
+
+            axios.delete('', {
                 data: {
-                    deletedProduct: checkedValues
+                    productIdsForDeletion: checkedProductIdsForDeletion
                 }
             })
                 .then(function (response) {
                     console.log(response);
-                    if (response.data.success_fail_status == false) {
-                        alert('상품 삭제 실패! 자신의 상품이 맞는지 확인해주세요');
-                    } else if (response.data.success_fail_status == true) {
-                        alert('상품 삭제 성공.');
-                        //window.location.reload();
-                    } else {
-                        /*alert('잘못된 접근입니다.');
-                        window.location.href = '{{ route('home') }}';*/
-                    }
                 })
                 .catch(function (error) {
                     console.log(error)
@@ -50,6 +72,7 @@
                 .finally(function () {
                     console.log('done');
                 })
+*/
 
         }
 
@@ -138,7 +161,7 @@
         <tr>
             <td>
                 {{ $product->id }}
-                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productMultiDelete[]" value="{{ $product->id }}" multiple />
+                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productsDelete[]" value="{{ $product->id }}" multiple />
             </td>
             <td><button type="button" class="btn btn-light" data-toggle="modal" data-target="#productImage{{ $product->id }}">{{ $product->name }}</button></td>
             <div class="modal fade" id="productImage{{ $product->id }}" tabindex="-1" role="dialog" aria-hidden="true">
@@ -157,20 +180,21 @@
                 </div>
             </div>
             <td>{{ $product->price }} 원</td>
-            <td>{{ $product->discounted_price}} 원</td>
+            <td>{{ $product->discounted_price }} 원</td>
             <td>{{ $product->stock }}</td>
             <td>{{ $product->brand->name }}</td>
             <td>{{ $product->category->name }}</td>
             <td>{{ $product->seller->name }}</td>
             <td>{{ $product->created_at }}</td>
             <td>{{ $product->status }}</td>
-            <td><a class="btn btn-light" role="button" onclick="deleteProduct({{ $product->id }})">삭제</a></td>
+            <td><button data-delete-url="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</button></td>
+{{--            <td><a href="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</a></td>--}}
             <td><a class="btn btn-light" href="{{ route('products.edit', ['product_id' => $product->id]) }}" role="button">수정</a></td>
         </tr>
     @endforeach
 </table>
 
-<button class="btn btn-dark" role="button" id="multiDelete" onclick="multiDelete()">일괄삭제</button>
+<button class="btn btn-dark" role="button" id="multiDelete" onclick="deleteProducts()">일괄삭제</button>
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}
