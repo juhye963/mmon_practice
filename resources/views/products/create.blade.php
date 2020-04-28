@@ -1,7 +1,7 @@
 
 @extends('layouts.master')
 
-@section('script')
+@section('script_top')
     @parent
     {{-- 부모컨텐츠를 겹쳐 쓰지 않고 추가합니다 --}}
     {{-- include한 곳에서도 써야함 --}}

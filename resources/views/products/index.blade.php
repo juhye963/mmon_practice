@@ -6,74 +6,81 @@
     </style>
 @endsection
 
-@section('script')
+@section('script_bottom')
     <script>
-        document.querySelector('.btn.btn-light.btn_remove').addEventListener('click', deleteThis);
-
-        function deleteThis(_event) {
-            _event.preventDefault();
-            console.log(this.dataset.deleteUrl);
+        var selectAllButton = document.querySelectorAll('.btn.btn-light.btn-remove');
+        //console.log(selectAllButton.length);
+        for (var i = 0; i < selectAllButton.length; i++) {
+            selectAllButton[i].addEventListener('click', deleteThisProduct);
         }
 
-        function checkThisProductAndDelete(productId) {
-            //console.log(productId);
-            var checkboxElementId = 'multiDelete'+productId;
-            var productIdToCheck =  document.getElementById(checkboxElementId);
-            productIdToCheck.checked = true;
-            //console.log(document.getElementsByName('productsDelete[]')[0].checked);
+        document.getElementById('productMultiDelete').addEventListener('click', deleteCheckedProducts)
 
-            deleteProducts();
-        }
+        function deleteThisProduct(_event) {
+            //_event.preventDefault(); a 태그에서 button 태그로 바꿨으니까 필요 없음
+            console.log('삭제주소 : '+this.dataset.deleteUrl);
+            var productDeleteUrl = this.dataset.deleteUrl;
 
-        function deleteProducts() {
-            var productCheckboxForDeletion = document.getElementsByName('productsDelete[]');
-            var checkedProductIdsForDeletion = [];
-            for (let i = 0; i < productCheckboxForDeletion.length; i++) {
-                if (productCheckboxForDeletion[i].checked) {
-                    //checkedValues += "," + deleteCheckbox[i].value;
-                    checkedProductIdsForDeletion.push(productCheckboxForDeletion[i].value);
-                }
-            }
-
-            var deleteUrl = '{!! json_encode(url("/products/delete")) !!}'; //이스케이프 안하면 &quot 으로 보간되어나옴
-            var deleteParams = jQuery.param({"product_id":checkedProductIdsForDeletion});
-
-            var url = "http://board-test.localhost/products/delete" + "숫자"
-            console.log(deleteParams);
-
-            // 1. "http://board-test.localhost/products/delete" + "숫자"
-            // 2. "http://board-test.localhost/products/delete/#pid#"
-            // 3. 라우트 자체를 변경(라우트 파라미터 없앰)
-            // 4. 라우트 자체를 변경(라우트 파라미터를 optional 처리)
-            // 5.
-            //
-            // http://                                                                         --protocol
-            //     board-test.localhost                                                        -- host
-            //     /products/destory/                                              --path
-            //     ?
-            //     search_type=prds_nm&search_word=&sort=recent&start_date=&end_date=         --query string
-            //     #ssasd                                                                      --hashtag
-
-
-
-/*
-
-            axios.delete('', {
-                data: {
-                    productIdsForDeletion: checkedProductIdsForDeletion
-                }
-            })
+            axios.delete(productDeleteUrl)
                 .then(function (response) {
                     console.log(response);
+                    alert('상품이 성공적으로 삭제되었습니다.');
+                    window.location.reload();
                 })
                 .catch(function (error) {
-                    console.log(error)
+                    if(error.response) {
+                        if (error.response.status == 403 || error.response.status == 500) {
+                            alert(error.response.data.message);
+                        } else {
+                            console.log(response);
+                        }
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
                 })
                 .finally(function () {
                     console.log('done');
                 })
-*/
+        }
 
+        function deleteCheckedProducts() {
+            //alert('dd');
+            var productCheckboxForDeletion = document.getElementsByName('productsDelete[]');
+            var checkedProductIdsForDeletion = [];
+            for (let i = 0; i < productCheckboxForDeletion.length; i++) {
+                if (productCheckboxForDeletion[i].checked) {
+                    checkedProductIdsForDeletion.push(productCheckboxForDeletion[i].value);
+                }
+            }
+
+            axios.delete('{{ route("products.destroy-many") }}', {
+                data: {
+                    product_ids_for_deletion: checkedProductIdsForDeletion
+                }
+            })
+                .then(function (response) {
+                    console.log(response);
+                    alert('상품이 성공적으로 삭제되었습니다.');
+                    window.location.reload();
+                })
+                .catch(function (error) {
+                    if(error.response) {
+                        if (error.response.status == 403 || error.response.status == 500) {
+                            alert(error.response.data.message);
+                        } else {
+                            console.log(response);
+                        }
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                })
+                .finally(function () {
+                    console.log('done');
+                })
         }
 
     </script>
@@ -187,14 +194,14 @@
             <td>{{ $product->seller->name }}</td>
             <td>{{ $product->created_at }}</td>
             <td>{{ $product->status }}</td>
-            <td><button data-delete-url="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</button></td>
+            <td><button data-delete-url="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn-remove" role="button">삭제</button></td>
 {{--            <td><a href="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</a></td>--}}
             <td><a class="btn btn-light" href="{{ route('products.edit', ['product_id' => $product->id]) }}" role="button">수정</a></td>
         </tr>
     @endforeach
 </table>
 
-<button class="btn btn-dark" role="button" id="multiDelete" onclick="deleteProducts()">일괄삭제</button>
+<button class="btn btn-dark " role="button" id="productMultiDelete">일괄삭제</button>
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}

@@ -1,4 +1,4 @@
-@section('script')
+@section('script_top')
     @parent
     <script>
         function createFormData() {

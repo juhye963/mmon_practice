@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 {{--다른 곳으로 빼기--}}
-@section('script')
+@section('script_top')
     <script type="text/javascript">
         function checkIfEmailHasBeenTaken(receivedEmail) {
             var re = /\S+@\S+\.\S+/;

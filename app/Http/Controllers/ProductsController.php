@@ -7,10 +7,11 @@ use App\Category;
 use App\Product;
 use App\Seller;
 use http\Env\Response;
+use http\Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-//use Illuminate\Support\Facades\DB;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -18,8 +19,6 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Whoops\Exception\ErrorException;
-use function Couchbase\defaultDecoder;
 
 class ProductsController extends Controller
 {
@@ -309,42 +308,52 @@ class ProductsController extends Controller
 
     public function destroy(Request $request, string $product_id)
     {
-        // Validation\
-        return response()->json($product_id, 400);
+        $product_to_delete = Product::findOrFail($product_id);
+        //예외를 처리하지 않는다면 404 HTTP 응답이 자동으로 사용자에게 보내집니다.
 
-        dd ($request->input('productIdsForDeletion'));
-        $deleteProductId = $request->input('deletedProduct','');
+        throw_if( $product_to_delete->seller_id != auth()->user()->id,
+            AuthorizationException::class,
+            '상품을 삭제할 권한이 없습니다.'
+        );//code 403
 
+        throw_if(
+            method_exists($product_to_delete, 'trashed') == false,
+            \Exception::class,
+            '소프트 삭제 할 수 없어 삭제가 취소되었습니다. 관리자에게 문의 바랍니다.'
+        );
 
+        $product_to_delete->delete();
+        return response()->json([]);
+    }
 
-        // Define & Request
+    public function destroyMany(Request $request) {
 
-        // DataSet
+        //dd(count($request->input('product_ids_for_deletion')));
+        $validator = Validator::make($request->only('product_ids_for_deletion'), [
+            'product_ids_for_deletion' => 'required|array|min:1',
+            'product_ids_for_deletion.*' => 'required|exists:mall_products,id'
+        ]);
 
-        // Return
+        $product_ids_to_delete = $request->input('product_ids_for_deletion');
+        $current_login_seller = auth()->user()->id;
+        $is_my_product = Product::whereIn('id', $product_ids_to_delete)->where('seller_id', '!=', $current_login_seller)->first();
+        //dd($is_my_product); first()는 첫번째모델 or null return
 
-        $products = Product::whereIn('id', $request->input('deletedProduct'));
+        throw_if(
+            $is_my_product != null,
+            AuthorizationException::class,
+            '삭제 권한이 없는 상품이 포함되어있습니다.'
+        ); //403
 
-        $current_seller_id = auth()->user()->id;
-        $id_match = $products->where('seller_id', '!=', $current_seller_id)->get();
+        throw_if(
+            method_exists(Product::whereIn('id', $product_ids_to_delete)->first(), 'trashed') == false,
+            \Exception::class,
+            '소프트 삭제 할 수 없어 삭제가 취소되었습니다. 관리자에게 문의 바랍니다.'
+        ); //500
 
-        $products->delete();
+        Product::whereIn('id', $product_ids_to_delete)->delete();
 
-        //try catch로 (저쪽에서 then 에 안걸리게) -> throws new Exception
-        //함수에 리턴 하나일필요 없음
-        //실패를 예외로 처리 = 간단해짐
-        if ($id_match->isEmpty()) {
-            $products->delete();
-            //return view('products.index')->with('success', ['상품 삭제가 완료되었습니다.']);
-            return response()->json([
-                'success_fail_status' => true
-            ]);
-        } else {
-            //return redirect()->back()->with('error', ['자신의 상품만 삭제 가능']);
-            return response()->json([
-                'success_fail_status' => false
-            ]);
-        }
+        return response()->json([]);
 
     }
 

@@ -12,6 +12,8 @@ class Brand extends Model
 
     protected $fillable = ['name'];
 
+    public $timestamps = false;
+
     public function sellers()
     {
         return $this->hasMany(Seller::class,'brand_id');

@@ -20,7 +20,10 @@ class Seller extends Authenticatable
         'name', 'email', 'password', 'brand_id'
     ];
 
-    protected $hidden = 'password';
+    //protected $hidden = 'password';
+    //ErrorException  : count(): Parameter must be an array or an object that implements Countable
+    //  at D:\workspace\board-test\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasAttributes.php:299
+    //hidden 설정해놓으면 위의 오류남 (가시성, 비가시성을 설정한다는데)
 
     public function brand()
     {

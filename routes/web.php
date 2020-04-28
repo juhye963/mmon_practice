@@ -95,6 +95,12 @@ Route::post('/products/image-upload', [
 Route::delete('/products/destroy/{product_id}', [
     'as' => 'products.destroy',
     'uses' => 'ProductsController@destroy'
+])->where('product_id', '[0-9]+');
+//잘못된 접근 : "Symfony\Component\HttpKernel\Exception\NotFoundHttpException" 발생
+
+Route::delete('/products/destroy-many', [
+    'as' => 'products.destroy-many',
+    'uses' => 'ProductsController@destroyMany'
 ]);
 
 
@@ -121,7 +127,15 @@ Route::get('/categories/display-sub-categories',[
     'uses' => 'CategoriesController@displaySubCategories'
 ]);
 
+Route::get('/test', function () {
+    /*$faker = \Faker\Factory::create();
+    $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
+    dd($faker->productName);*/
 
+    //dd(App\Category::all()->random(1)->first()->id);
+
+    dd(App\Seller::where('brand_id', '!=', null));
+});
 
 
 
