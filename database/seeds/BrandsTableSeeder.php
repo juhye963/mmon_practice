@@ -11,6 +11,14 @@ class BrandsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\Brand::class, 200)->create();
+        //factory(App\Brand::class, 200)->create();
+
+        $faker = \Faker\Factory::create();
+
+        for ($i = 0; $i < 200; $i++) {
+            App\Brand::create([
+                'name' => $faker->company
+            ]);
+        }
     }
 }
