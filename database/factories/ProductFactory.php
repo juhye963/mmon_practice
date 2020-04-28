@@ -19,15 +19,21 @@ $factory->define(Product::class, function (Faker $faker) {
     $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
 
     $price = $faker->numberBetween($min = 0, $max = 1000000);
+    $discount_in_percentage  = $faker->numberBetween($min = 0, $max = 99);
+    $discounted_price = $discount_in_percentage ? $price*($discount_in_percentage/100) : $price;
 
-    $date =
+    $status_enum_value = array('selling', 'stop_selling', 'sold_out');
+    $rand_key = array_rand($status_enum_value, 1);
+
+    $date = $faker->dateTimeThisMonth;
 
     return [
         'name' => $faker->productName,
         'price' => $price,
-        'discounted_price' => $price,
+        'discounted_price' => $discounted_price,
         'stock' => $faker->numberBetween($min = 0, $max = 16777215),
-        //'status' =>
-        ''
+        'status' => $status_enum_value[$rand_key],
+        'created_at' => $date,
+        'updated_at' => $date
     ];
 });

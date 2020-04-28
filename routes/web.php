@@ -127,6 +127,11 @@ Route::get('/categories/display-sub-categories',[
     'uses' => 'CategoriesController@displaySubCategories'
 ]);
 
+
+Route::post('/dummy-data', function() {
+
+});
+
 Route::get('/test', function () {
     /*$faker = \Faker\Factory::create();
     $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
@@ -134,7 +139,22 @@ Route::get('/test', function () {
 
     //dd(App\Category::all()->random(1)->first()->id);
 
-    dd(App\Seller::where('brand_id', '!=', null));
+    //dd(App\Seller::where('brand_id', '!=', null));
+
+    /*$status_enum_value = array('selling', 'stop_selling', 'sold_out');
+    $rand_key = array_rand($status_enum_value, 1);
+    dd($status_enum_value[$rand_key]);*/
+
+    //dd(App\Seller::where('brand_id', '!=', null)->get()->random(1)->first()->id);
+
+    /*$faker = \Faker\Factory::create();
+    $price = $faker->numberBetween($min = 0, $max = 1000000);
+    $discount_in_percentage  = $faker->numberBetween($min = 0, $max = 99);
+    $discounted_price = $discount_in_percentage ? $price*($discount_in_percentage/100) : $price;
+
+    dd($discounted_price);*/
+
+    //dd(config('database.default') !== 'sqlite');
 });
 
 
