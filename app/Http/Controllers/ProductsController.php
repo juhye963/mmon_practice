@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Arr;
+
 
 class ProductsController extends Controller
 {
@@ -357,4 +360,47 @@ class ProductsController extends Controller
 
     }
 
+    public function insertManyProducts() {
+
+       // dd($this->makeRandomKoreanProductName());
+
+        ini_set('max_execution_time', 6000); // 10분
+
+        $categories = Category::all();
+        $sellers = Seller::where('brand_id', '!=', null)->get();
+        $status_enum_value = array('selling', 'stop_selling', 'sold_out');
+
+        for ($i = 0; $i < 100000; $i++) {
+
+            $random_seller = $sellers->random(1)->first();
+            $random_price = rand(0, 1000000);
+            $random_discount_percentage = rand(0,100);
+            $discounted_price = $random_discount_percentage ? $random_price*($random_discount_percentage/100) : $random_price;
+
+            $result =  Product::create([
+                'name' => $this->makeRandomKoreanProductName(),
+                'price' => $random_price,
+                'discounted_price' => $discounted_price,
+                'seller_id' => $random_seller->id,
+                'stock' => rand(0, 16777215),
+                'status' => Arr::random($status_enum_value),
+                'category_id' => $categories->random(1)->first()->id,
+                'brand_id' => $random_seller->brand_id,
+            ]);
+        }
+
+        return $i;
+    }
+
+    public function makeRandomKoreanProductName() {
+        $product_name = [
+            'adjectives' => ['작은', '큰', '유행 안타는', '가벼운', '가성비 좋은', '일상적인', '힙한'],
+            'colors' => ['베이비핑크', '블랙', '네이비', '실버', '베이지', '로즈골드', '화이트골드', '카키'],
+            'items' => ['스니커즈', '샤프', '노트북', '지갑', '슬랙스', '셔츠', '가디건', '메모지', '코트', '패딩', '손난로', '다이어리']
+        ];
+
+        return Arr::random($product_name['adjectives'])
+            .' '. Arr::random($product_name['colors'])
+            .' '. Arr::random($product_name['items']);
+    }
 }

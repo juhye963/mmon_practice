@@ -11,6 +11,11 @@ class CategoriesTableSeeder extends Seeder
      */
     public function run()
     {
+
+        $faker = \Faker\Factory::create();
+        $random_image_path = $faker->image(storage_path('app/public/product_image'), 400, 200, null, true);
+        dd($random_image_path);
+
         /*factory(App\Category::class, 10)->create();
         $categories = App\Category::all();
 
@@ -26,6 +31,7 @@ class CategoriesTableSeeder extends Seeder
         $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
 
         //dd($faker->department(2,false));
+        //dd(App\Category::where('pid', '=', 0)->get()->random()->id);
 
         for ($i = 0; $i < 10; $i++) {
             App\Category::create([
@@ -34,12 +40,11 @@ class CategoriesTableSeeder extends Seeder
             ]);
         }
 
-        for ($i = 0; $i < 4; $i++) {
-            App\Category::all()->each(function($parent_category){
-                $parent_category->subCategories()->create([
-                    'name' => $faker->department
-                ]);
-            });
+        for ($i = 0; $i < 40; $i++) {
+            App\Category::create([
+                'name' => $faker->department(1),
+                'pid' => App\Category::where('pid', '=', 0)->get()->random()->id
+            ]);
         }
     }
 }

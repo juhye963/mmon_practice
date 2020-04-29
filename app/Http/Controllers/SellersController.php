@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 
@@ -115,5 +116,30 @@ class SellersController extends Controller
         $seller->save();
 
         return redirect()->route('home');
+    }
+
+    public function insertManySellers() {
+
+        //dd(date('Y-m-d H:i:s', mt_rand(1,time())));
+        /*dd(Seller::create([
+            'name' => Str::random(6),
+            'email' => Str::random(5).'@example.com',
+            'password' => bcrypt('password'),
+            'brand_id' => Brand::all()->random()->id,
+        ]));*/
+
+        for ($i = 0; $i < 3; $i++) {
+
+            $date = date('Y-m-d H:i:s', mt_rand(1,time()));
+
+            Seller::insert([
+                'name' => Str::random(6),
+                'email' => Str::random(5).'@example.com',
+                'password' => bcrypt('password'),
+                'brand_id' => Brand::all()->random()->id,
+                'created_at' => $date,
+                'updated_at' => $date
+            ]);
+        }
     }
 }

@@ -1,2 +1,3 @@
-
-{{dd(asset('/products_image/12.jpg'))}}
+<input type="file" name="p">
+<input type="file">
+<input type="file">

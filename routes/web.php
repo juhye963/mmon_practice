@@ -128,9 +128,12 @@ Route::get('/categories/display-sub-categories',[
 ]);
 
 
-Route::post('/dummy-data', function() {
 
-});
+/* 대량 데이터 만들기 */
+Route::get('/many-brands', 'BrandsController@insertManyBrands');
+Route::get('/many-sellers', 'SellersController@insertManySellers');
+Route::get('/many-categories', 'CategoriesController@insertManyCategories');
+Route::get('/many-products', 'ProductsController@insertManyProducts');
 
 Route::get('/test', function () {
     /*$faker = \Faker\Factory::create();
@@ -155,7 +158,17 @@ Route::get('/test', function () {
     dd($discounted_price);*/
 
     //dd(config('database.default') !== 'sqlite');
+
+    /*$status_enum_value = array('selling', 'stop_selling', 'sold_out');
+    //$rand_key = array_rand($status_enum_value, 1);
+    dd(\Illuminate\Support\Arr::random($status_enum_value));*/
+
+    $faker = \Faker\Factory::create();
+    $random_image = $faker->image(storage_path('app/public/product_image'), 400, 200, null, false);
+    dd($random_image);
 });
+
+
 
 
 

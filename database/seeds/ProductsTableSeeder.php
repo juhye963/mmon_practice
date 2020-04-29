@@ -11,10 +11,12 @@ class ProductsTableSeeder extends Seeder
      */
     public function run()
     {
+
         $categories = App\Category::all();
         $sellers = App\Seller::where('brand_id', '!=', null)->get();
 
-        for ($i = 0; $i < 50000; $i++) {
+        for ($i = 0; $i < 950000; $i++) {
+
             $random_seller = $sellers->random(1)->first();
             /*dump($random_seller->brand_id);
             dump($random_seller->id);
@@ -26,5 +28,6 @@ class ProductsTableSeeder extends Seeder
                 'brand_id' => $random_seller->brand_id
             ]);
         }
+
     }
 }
