@@ -115,12 +115,13 @@ Route::post('/products/update', [
     'uses' => 'ProductsController@update'
 ]);
 
+Route::get('/show-categories-select',[
+    'as' => 'categories.select',
+    'uses' => 'ProductsController@selectCategoryToUpdateSelectedProduct'
+]);
+
 
 /*카테고리*/
-Route::get('/categories/select',[
-    'as' => 'categories',
-    'uses' => 'CategoriesController@select'
-]);
 
 Route::get('/categories/display-sub-categories',[
     'as' => 'categories.display-sub-categories',
@@ -129,16 +130,38 @@ Route::get('/categories/display-sub-categories',[
 
 
 
-/* 대량 데이터 만들기 */
+/* 대량 데이터 */
 Route::get('/many-brands', 'BrandsController@insertManyBrands');
 Route::get('/many-sellers', 'SellersController@insertManySellers');
 Route::get('/many-categories', 'CategoriesController@insertManyCategories');
-Route::get('/many-products', 'ProductsController@insertManyProducts');
-Route::get('/many-products2', 'ProductsController@insertManyProducts2')->name('many.products');
+Route::get('/many-products', 'ProductsController@insertManyProducts')->name('many.products');
+Route::get('/empty-all', function () {
+
+    if (config('database.default') !== 'sqlite') {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    }
+
+    //App\Brand::truncate();
+
+    //App\Seller::truncate();
+
+    //App\Category::truncate();
+
+    App\Product::truncate();
+
+
+    if (config('database.default') !== 'sqlite') {
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    }
+});
+
 
 Route::get('/test', function () {
-    app('debugbar')->disable();
-    print 'abc';
+
+    dd( view('products.show-category-select')->getPath());
+
+    /*app('debugbar')->disable();
+    print 'abc';*/
     /*$faker = \Faker\Factory::create();
     $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
     dd($faker->productName);*/

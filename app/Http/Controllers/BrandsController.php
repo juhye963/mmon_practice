@@ -24,22 +24,21 @@ class BrandsController extends Controller
 
         //dd(Arr::random($brands_name_prefix).' & '.Arr::random($brands_name_suffix));
 
-        for ($i = 0; $i < 100; $i++) {
+        $brands_data_set = [];
+
+        for ($i = 0; $i < 200; $i++) {
             $random_brand_name = Arr::random($brands_name_prefix).' & '.Arr::random($brands_name_suffix);
             if (Brand::where('name', '=', $random_brand_name)->first() != null) {
                 $i--;
                 continue;
             }
-            Brand::create([
+            $brands_data_set[$i] = [
                 'name' => $random_brand_name
-            ]);
+            ];
         }
 
-        //재귀함수는 무한루프 돌 수 있으니 조심해서 써야함
-        //너무 많이 반복했을시 break 빠져나오는 조건
-        /*function makeRandomBrandName() {
-        }*/
+        Brand::insert($brands_data_set);
 
-        return $i;
+        return $i . "개의 브랜드 입력";
     }
 }

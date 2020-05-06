@@ -15,6 +15,7 @@
         }
 
         document.getElementById('productMultiDelete').addEventListener('click', deleteCheckedProducts)
+        document.getElementById('selectedProductCategoryChange').addEventListener('click', openCategorySelectPage)
 
         function deleteThisProduct(_event) {
             //_event.preventDefault(); a 태그에서 button 태그로 바꿨으니까 필요 없음
@@ -84,8 +85,25 @@
         }
 
         function changeCheckedProductsCategory () {
-            var selectedProductCheckbox = document.getElementById('productsSelect[]');
+            var selectedProductCheckbox = document.getElementsByName('productsSelect[]');
+            var checkedProductIds = [];
 
+            for (var i = 0; i < selectedProductCheckbox.length; i++) {
+                if (selectedProductCheckbox[i].checked) {
+                    checkedProductIds.push(selectedProductCheckbox[i].value);
+                }
+            }
+
+            console.log('이전 : '+document.getElementById("selectedCategoryForMultiProductUpdate").value);
+
+        }
+
+        function openCategorySelectPage () {
+            var categorySelectWindow = window.open(this.dataset.categorySelectUrl, '카테고리 선택', "resizable,scrollbars,status");
+        }
+
+        function hello() {
+            alert('hello');
         }
 
     </script>
@@ -151,6 +169,9 @@
 </form>
 </div>
 
+<div id = "selectedCategoryForMultiProductUpdateArea">
+    <input type="hidden" value="default" id="selectedCategoryForMultiProductUpdate">
+</div>
 
 <table cellpadding="10" class="table table-bordered text-center">
     <thead class="thead-light">
@@ -173,7 +194,7 @@
         <tr>
             <td>
                 {{ $product->id }}
-                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productsSelect[]" value="{{ $product->id }}" multiple />
+                <input type="checkbox" id="multiSelect{{ $product->id }}" name="productsSelect[]" value="{{ $product->id }}" multiple />
             </td>
             <td><button type="button" class="btn btn-light" data-toggle="modal" data-target="#productImage{{ $product->id }}">{{ $product->name }}</button></td>
             <div class="modal fade" id="productImage{{ $product->id }}" tabindex="-1" role="dialog" aria-hidden="true">
@@ -207,7 +228,7 @@
 </table>
 
 <button class="btn btn-dark " role="button" id="productMultiDelete">일괄삭제</button>
-<button class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
+<button data-category-select-url="{{ route('categories.select') }}" class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}

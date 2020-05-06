@@ -1,7 +1,6 @@
+
 @section('script_top')
     @parent
-    {{-- 부모컨텐츠를 겹쳐 쓰지 않고 추가합니다 --}}
-    {{-- 상품생성폼 말고도 다른곳에서도 include할 수도 있고, 그곳에서는 script가 이미 있을 수 있음 --}}
     <script type="text/javascript">
         function createSubCategoriesSelect(Data) {
             var categorySelectArea = document.getElementById("categorySelect");
@@ -72,6 +71,7 @@
     </script>
 
 @endsection
+
 
 <div class="form-group" id="categorySelect">
     <legend>상품 카테고리 셀렉</legend>

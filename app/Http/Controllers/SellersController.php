@@ -121,25 +121,30 @@ class SellersController extends Controller
     public function insertManySellers() {
 
         //dd(date('Y-m-d H:i:s', mt_rand(1,time())));
-        /*dd(Seller::create([
-            'name' => Str::random(6),
-            'email' => Str::random(5).'@example.com',
-            'password' => bcrypt('password'),
-            'brand_id' => Brand::all()->random()->id,
-        ]));*/
+        app('debugbar')->disable();
+        ini_set('max_execution_time', 3000);
+        ini_set('memory_limit','512M');
 
-        for ($i = 0; $i < 3; $i++) {
+        $sellers_data_set = [];
+
+        for ($i = 0; $i < 1500; $i++) {
 
             $date = date('Y-m-d H:i:s', mt_rand(1,time()));
 
-            Seller::insert([
+            $sellers_data_set[$i] = [
                 'name' => Str::random(6),
                 'email' => Str::random(5).'@example.com',
                 'password' => bcrypt('password'),
                 'brand_id' => Brand::all()->random()->id,
                 'created_at' => $date,
                 'updated_at' => $date
-            ]);
+            ];
         }
+
+        //dd($sellers_data_set);
+
+        Seller::insert($sellers_data_set);
+
+        return $i . "건의 데이터 입력";
     }
 }

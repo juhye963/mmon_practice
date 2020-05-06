@@ -360,40 +360,6 @@ class ProductsController extends Controller
 
     }
 
-    public function insertManyProducts() {
-        // dd($this->makeRandomKoreanProductName());
-
-        ini_set('max_execution_time', 6000); // 10분
-        ini_set('memory_limit','512M');
-
-        $categories = Category::all();
-        $sellers = Seller::where('brand_id', '!=', null)->get();
-        $status_enum_value = array('selling', 'stop_selling', 'sold_out');
-
-        for ($i = 0; $i < 2; $i++) {
-
-            $random_seller = $sellers->random(1)->first();
-            $random_price = rand(0, 1000000);
-            $random_discount_percentage = rand(0,100);
-            $discounted_price = $random_discount_percentage ? $random_price*($random_discount_percentage/100) : $random_price;
-
-            $result =  Product::create([
-                'name' => $this->makeRandomKoreanProductName(),
-                'price' => $random_price,
-                'discounted_price' => $discounted_price,
-                'seller_id' => $random_seller->id,
-                'stock' => rand(0, 16777215),
-                'status' => Arr::random($status_enum_value),
-                'category_id' => $categories->random(1)->first()->id,
-                'brand_id' => $random_seller->brand_id,
-            ]);
-
-            if ($i % 500 == 0) {
-                dump( $i . " 건의 데이터, 메모리사용량 : " .  memory_get_peak_usage());
-            }
-        }
-    }
-
     public function makeRandomKoreanProductName() {
         $product_name = [
             'adjectives' => ['작은', '큰', '유행 안타는', '가벼운', '가성비 좋은', '일상적인', '힙한'],
@@ -406,7 +372,7 @@ class ProductsController extends Controller
             .' '. Arr::random($product_name['items']);
     }
 
-    public function insertManyProducts2() {
+    public function insertManyProducts() {
 
         app('debugbar')->disable();
         ini_set('max_execution_time', 3000);
@@ -424,6 +390,7 @@ class ProductsController extends Controller
                 $random_price = rand(0, 1000000);
                 $random_discount_percentage = rand(0,100);
                 $discounted_price = $random_discount_percentage ? $random_price*($random_discount_percentage/100) : $random_price;
+                $date = date('Y-m-d H:i:s', mt_rand(0,time()));
 
                 $productDataSet[$j] =  [
                     'name' => $this->makeRandomKoreanProductName(),
@@ -434,7 +401,8 @@ class ProductsController extends Controller
                     'status' => Arr::random($status_enum_value),
                     'category_id' => $categories->random(1)->first()->id,
                     'brand_id' => $random_seller->brand_id,
-
+                    'created_at' => $date,
+                    'updated_at' => $date
                 ];
             }
 
@@ -444,6 +412,23 @@ class ProductsController extends Controller
         }
 
         return $j . "개의 데이터를 " . $i . "번 insert";
+    }
+
+    public function selectCategoryToUpdateSelectedProduct(Request $request)
+    {
+        $selected_products_ids = $request->input('selected_products_id', []);
+
+        $categories = Category::where('pid', '=', '0')->get();
+        return view('products.show-category-select')->with([
+            'categories' => $categories,
+            'product_sub_category_id' => '',
+            'product_parent_category_id' => '',
+            'selected_products_id' => $selected_products_ids
+        ]);
+    }
+
+    public function UpdateSelectedProduct() {
+
     }
 
 

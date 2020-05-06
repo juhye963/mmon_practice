@@ -46,7 +46,7 @@
 @endsection
 
 @section('content')
-
+    @parent
 <h3>상품등록</h3>
 
 @include('products.form', [
