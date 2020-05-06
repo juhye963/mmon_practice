@@ -414,20 +414,23 @@ class ProductsController extends Controller
         return $j . "개의 데이터를 " . $i . "번 insert";
     }
 
-    public function selectCategoryToUpdateSelectedProduct(Request $request)
+    public function selectCategoryToUpdateSelectedProduct()
     {
-        $selected_products_ids = $request->input('selected_products_id', []);
-
         $categories = Category::where('pid', '=', '0')->get();
         return view('products.show-category-select')->with([
             'categories' => $categories,
             'product_sub_category_id' => '',
             'product_parent_category_id' => '',
-            'selected_products_id' => $selected_products_ids
         ]);
     }
 
-    public function UpdateSelectedProduct() {
+    public function changeCategoryOfSelectedProducts(Request $request) {
+        $category = $request->input('selected_category_to_update_checked_products', '');
+        $selectedProductId = $request->input('selected_products_to_change_category', []);
+
+        Product::whereIn('id', $selectedProductId)->update(['category_id' => $category]);
+
+        return response()->json([]);
 
     }
 

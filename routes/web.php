@@ -120,6 +120,11 @@ Route::get('/show-categories-select',[
     'uses' => 'ProductsController@selectCategoryToUpdateSelectedProduct'
 ]);
 
+Route::post('/update-selected-product', [
+    'as' => 'update.category.selected.products',
+    'uses' => 'ProductsController@changeCategoryOfSelectedProducts'
+]);
+
 
 /*카테고리*/
 
@@ -145,7 +150,7 @@ Route::get('/empty-all', function () {
 
     //App\Seller::truncate();
 
-    //App\Category::truncate();
+    App\Category::truncate();
 
     App\Product::truncate();
 

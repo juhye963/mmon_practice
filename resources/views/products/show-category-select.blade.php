@@ -18,16 +18,9 @@
                 var selectedSubCategory = parseInt(document.getElementById('subCategoryId').value);
                 $(opener.document).find("#selectedCategoryForMultiProductUpdate").val(selectedSubCategory);
                 console.log($(opener.document).find("#selectedCategoryForMultiProductUpdate").val());
-                opener.parent.hello();
+                opener.parent.changeCheckedProductsCategory();
                 window.self.close();
             }
-
-          //console.log(document.getElementById('categoryPid').value);
-          //console.log(document.getElementById('subCategoryId').value);
-        }
-
-        function reloadSelectedCategoryIdData () {
-
         }
     </script>
 @endsection

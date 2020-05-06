@@ -86,24 +86,43 @@
 
         function changeCheckedProductsCategory () {
             var selectedProductCheckbox = document.getElementsByName('productsSelect[]');
-            var checkedProductIds = [];
+            //var checkedProductIds = [];
+            var updateCategoryOfCheckedProductFormData = new FormData();
 
             for (var i = 0; i < selectedProductCheckbox.length; i++) {
                 if (selectedProductCheckbox[i].checked) {
-                    checkedProductIds.push(selectedProductCheckbox[i].value);
+                    //checkedProductIds.push(selectedProductCheckbox[i].value);
+                    updateCategoryOfCheckedProductFormData.append('selected_products_to_change_category[]', selectedProductCheckbox[i].value);
                 }
             }
 
-            console.log('이전 : '+document.getElementById("selectedCategoryForMultiProductUpdate").value);
+            updateCategoryOfCheckedProductFormData.append('selected_category_to_update_checked_products',
+                document.getElementById("selectedCategoryForMultiProductUpdate").value);
+            console.log('선택된 카테고리 : '+updateCategoryOfCheckedProductFormData.getAll('selected_category_to_update_checked_products'));
+            console.log('선택된 상품 : '+updateCategoryOfCheckedProductFormData.getAll('selected_products_to_change_category[]'));
+
+            axios({
+                method: 'post',
+                url: '{{ route("update.category.selected.products") }}',
+                data: updateCategoryOfCheckedProductFormData,
+                headers: { 'content-type': 'multipart/form-data' },
+                // processData: false
+            })
+                .then(function (response) {
+                    console.log(response);
+                    alert('상품이 성공적으로 삭제되었습니다.');
+                    window.location.reload();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+                .then(function () {
+                });
 
         }
 
         function openCategorySelectPage () {
             var categorySelectWindow = window.open(this.dataset.categorySelectUrl, '카테고리 선택', "resizable,scrollbars,status");
-        }
-
-        function hello() {
-            alert('hello');
         }
 
     </script>
