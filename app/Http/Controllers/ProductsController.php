@@ -361,16 +361,16 @@ class ProductsController extends Controller
     }
 
     public function insertManyProducts() {
-
-       // dd($this->makeRandomKoreanProductName());
+        // dd($this->makeRandomKoreanProductName());
 
         ini_set('max_execution_time', 6000); // 10분
+        ini_set('memory_limit','512M');
 
         $categories = Category::all();
         $sellers = Seller::where('brand_id', '!=', null)->get();
         $status_enum_value = array('selling', 'stop_selling', 'sold_out');
 
-        for ($i = 0; $i < 100000; $i++) {
+        for ($i = 0; $i < 2; $i++) {
 
             $random_seller = $sellers->random(1)->first();
             $random_price = rand(0, 1000000);
@@ -387,9 +387,11 @@ class ProductsController extends Controller
                 'category_id' => $categories->random(1)->first()->id,
                 'brand_id' => $random_seller->brand_id,
             ]);
-        }
 
-        return $i;
+            if ($i % 500 == 0) {
+                dump( $i . " 건의 데이터, 메모리사용량 : " .  memory_get_peak_usage());
+            }
+        }
     }
 
     public function makeRandomKoreanProductName() {
@@ -403,4 +405,46 @@ class ProductsController extends Controller
             .' '. Arr::random($product_name['colors'])
             .' '. Arr::random($product_name['items']);
     }
+
+    public function insertManyProducts2() {
+
+        app('debugbar')->disable();
+        ini_set('max_execution_time', 3000);
+        ini_set('memory_limit','512M');
+
+        $productDataSet = [];
+        $categories = Category::all();
+        $sellers = Seller::where('brand_id', '!=', null)->get();
+        $status_enum_value = array('selling', 'stop_selling', 'sold_out');
+
+        for ($i = 0; $i < 100; $i++) {
+            for ($j = 0; $j < 1000; $j++) {
+
+                $random_seller = $sellers->random(1)->first();
+                $random_price = rand(0, 1000000);
+                $random_discount_percentage = rand(0,100);
+                $discounted_price = $random_discount_percentage ? $random_price*($random_discount_percentage/100) : $random_price;
+
+                $productDataSet[$j] =  [
+                    'name' => $this->makeRandomKoreanProductName(),
+                    'price' => $random_price,
+                    'discounted_price' => $discounted_price,
+                    'seller_id' => $random_seller->id,
+                    'stock' => rand(0, 16777215),
+                    'status' => Arr::random($status_enum_value),
+                    'category_id' => $categories->random(1)->first()->id,
+                    'brand_id' => $random_seller->brand_id,
+
+                ];
+            }
+
+            Product::insert($productDataSet);
+            $productDataSet = []; //비우기
+            dump("insert" . $i . " 번째. 메모리사용량(peak) : " . memory_get_peak_usage() . ", 메모리사용량(normal) : " . memory_get_usage() . ", 메모리사용량(true) : " . memory_get_peak_usage(true));
+        }
+
+        return $j . "개의 데이터를 " . $i . "번 insert";
+    }
+
+
 }

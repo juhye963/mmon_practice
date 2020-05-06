@@ -47,9 +47,9 @@
 
         function deleteCheckedProducts() {
             //alert('dd');
-            var productCheckboxForDeletion = document.getElementsByName('productsDelete[]');
+            var productCheckboxForDeletion = document.getElementsByName('productsSelect[]');
             var checkedProductIdsForDeletion = [];
-            for (let i = 0; i < productCheckboxForDeletion.length; i++) {
+            for (var i = 0; i < productCheckboxForDeletion.length; i++) {
                 if (productCheckboxForDeletion[i].checked) {
                     checkedProductIdsForDeletion.push(productCheckboxForDeletion[i].value);
                 }
@@ -81,6 +81,11 @@
                 .finally(function () {
                     console.log('done');
                 })
+        }
+
+        function changeCheckedProductsCategory () {
+            var selectedProductCheckbox = document.getElementById('productsSelect[]');
+
         }
 
     </script>
@@ -168,7 +173,7 @@
         <tr>
             <td>
                 {{ $product->id }}
-                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productsDelete[]" value="{{ $product->id }}" multiple />
+                <input type="checkbox" id="multiDelete{{ $product->id }}" name="productsSelect[]" value="{{ $product->id }}" multiple />
             </td>
             <td><button type="button" class="btn btn-light" data-toggle="modal" data-target="#productImage{{ $product->id }}">{{ $product->name }}</button></td>
             <div class="modal fade" id="productImage{{ $product->id }}" tabindex="-1" role="dialog" aria-hidden="true">
@@ -202,6 +207,7 @@
 </table>
 
 <button class="btn btn-dark " role="button" id="productMultiDelete">일괄삭제</button>
+<button class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}

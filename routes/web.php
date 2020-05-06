@@ -134,8 +134,11 @@ Route::get('/many-brands', 'BrandsController@insertManyBrands');
 Route::get('/many-sellers', 'SellersController@insertManySellers');
 Route::get('/many-categories', 'CategoriesController@insertManyCategories');
 Route::get('/many-products', 'ProductsController@insertManyProducts');
+Route::get('/many-products2', 'ProductsController@insertManyProducts2')->name('many.products');
 
 Route::get('/test', function () {
+    app('debugbar')->disable();
+    print 'abc';
     /*$faker = \Faker\Factory::create();
     $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
     dd($faker->productName);*/
@@ -163,9 +166,9 @@ Route::get('/test', function () {
     //$rand_key = array_rand($status_enum_value, 1);
     dd(\Illuminate\Support\Arr::random($status_enum_value));*/
 
-    $faker = \Faker\Factory::create();
+    /*$faker = \Faker\Factory::create();
     $random_image = $faker->image(storage_path('app/public/product_image'), 400, 200, null, false);
-    dd($random_image);
+    dd($random_image);*/
 });
 
 
