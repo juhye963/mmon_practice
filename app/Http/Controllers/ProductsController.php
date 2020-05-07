@@ -428,10 +428,118 @@ class ProductsController extends Controller
         $category = $request->input('selected_category_to_update_checked_products', '');
         $selectedProductId = $request->input('selected_products_to_change_category', []);
 
+        $request->validate([
+           'selected_category_to_update_checked_products' => 'required|exists:mall_categories,id',
+        ]);
+
+        foreach($request->get('selected_products_to_change_category') as $key => $value) {
+            $request->validate([
+               'selected_products_to_change_category.'.$key => 'required|exists:mall_products,id'
+            ]);
+        }
+        //https://laravel.io/forum/11-12-2014-how-to-validate-array-input
+
         Product::whereIn('id', $selectedProductId)->update(['category_id' => $category]);
 
         return response()->json([]);
 
+    }
+
+    public function changeCategoryOfSearchedProducts(Request $request) {
+
+        //dd($request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date', 'selected_category_to_update_searched_products'));
+
+        $products = Product::with('brand','category','seller');
+
+        $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date', 'selected_category_to_update_searched_products');
+
+        $parameters['search_type'] = $request->input('search_type', '');
+        $parameters['search_word'] = $request->input('search_word', '');
+        $parameters['sort'] = $request->input('sort', '');
+        $parameters['prds_status'] = $request->input('prds_status', []); // 상품상태는 배열로 들어옴
+        $parameters['start_date'] = $request->input('start_date', '');
+        $parameters['end_date'] = $request->input('end_date', '');
+        $parameters['selected_category_to_update_searched_products'] = $request->input('selected_category_to_update_searched_products', '');
+
+        /*validation*/
+        //검색어 있을때는 검색유형 필수
+        $request->validate([
+            'search_type' => [
+                'required_with:search_word',
+                Rule::in(['prds_nm', 'seller_nm', 'brand_nm', '']),
+            ],
+        ]);
+
+        //현재보다 미래의 날짜는 입력할 수 없음 (날짜 찍히는거 보고 잘 비교하기)
+        //날짜 한쪽이 입력되면 다른 한쪽도 필요함
+        if ($parameters['start_date'] != '' || $parameters['end_date'] != '') {
+            $request->validate([
+                'start_date' => 'required|date|before_or_equal:end_date',
+                'end_date' => 'required|date|before_or_equal:today',
+
+            ]);
+        }
+
+        /*조건적용*/
+        //검색키워드로 찾기
+        //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
+        if ($parameters['search_type'] == 'prds_nm') {
+            //더 좋은 방법 있을듯(계속 생각해보기)
+            $products = $products->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+        } elseif ($parameters['search_type'] == 'seller_nm') {
+            $products = $products->whereHas('seller', function (Builder $query) use ($parameters) {
+                $query->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+            });
+        } elseif ($parameters['search_type'] == 'brand_nm') {
+            $products = $products->whereHas('brand', function (Builder $query) use ($parameters) {
+                $query->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
+            });
+        }else {
+            $products = $products;
+        }
+
+        //체크박스!!
+        if ($parameters['prds_status'] != []) {
+            //dd(count($parameters['prds_status']));
+            $products = $products->whereIn('status', $parameters['prds_status']);
+        }
+
+        //like %%빼기
+
+        //날짜검색 있을때
+        // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
+        if ($parameters['start_date'] != '' && $parameters['end_date'] != '' ) {
+            $start_date = date('Y-m-d H:i:s', strtotime($parameters['start_date']));
+            //dd($start_date);
+            $end_date = date('Y-m-d H:i:s', strtotime("+1 days -1 second", strtotime($parameters['end_date'])));
+            //dd($end_date);
+            //23:59:59 종료일 포함시키지 않는 문제 해결
+            //dd ($parameters['end_date']);
+            $products = $products->whereBetween('created_at', [$start_date, $end_date]);
+        }
+
+        //정렬조건 붙이기
+        switch ($parameters['sort']) {
+            case 'recent':
+                $products = $products->orderByDesc('updated_at');
+                break;
+            case 'price_asc' :
+                $products = $products->orderBy('price');
+                break;
+            case 'price_desc' :
+                $products = $products->orderByDesc('price');
+                break;
+            case 'prds_name':
+                $products = $products->orderBy('name');
+                break;
+            default :
+                $products = $products->orderByDesc('id');
+                break;
+        }
+
+        $products->update(['category_id' => $parameters['selected_category_to_update_searched_products']]);
+
+        return response()->json([]);
     }
 
 

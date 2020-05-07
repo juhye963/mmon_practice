@@ -125,6 +125,11 @@ Route::post('/update-selected-product', [
     'uses' => 'ProductsController@changeCategoryOfSelectedProducts'
 ]);
 
+Route::post('/update-searched-product', [
+    'as' => 'update.category.searched.products',
+    'uses' => 'ProductsController@changeCategoryOfSearchedProducts'
+]);
+
 
 /*카테고리*/
 

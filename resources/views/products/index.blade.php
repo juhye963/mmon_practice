@@ -14,8 +14,15 @@
             selectAllButton[i].addEventListener('click', deleteThisProduct);
         }
 
-        document.getElementById('productMultiDelete').addEventListener('click', deleteCheckedProducts)
-        document.getElementById('selectedProductCategoryChange').addEventListener('click', openCategorySelectPage)
+        document.getElementById('productMultiDelete').addEventListener('click', deleteCheckedProducts);
+        document.getElementById('selectedProductCategoryChange').addEventListener('click', function () {
+            this.dataset.checkedOrNot = true;
+            openCategorySelectPage(this.dataset.categorySelectUrl)
+        });
+        document.getElementById('searchedProductCategoryChange').addEventListener('click', function () {
+            this.dataset.checkedOrNot = true;
+            openCategorySelectPage(this.dataset.categorySelectUrl)
+        });
 
         function deleteThisProduct(_event) {
             //_event.preventDefault(); a 태그에서 button 태그로 바꿨으니까 필요 없음
@@ -110,20 +117,84 @@
             })
                 .then(function (response) {
                     console.log(response);
-                    alert('상품이 성공적으로 삭제되었습니다.');
+                    alert('상품의 카테고리가 성공적으로 변경되었습니다.');
                     window.location.reload();
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    if(error.response) {
+                        if (error.response.status == 403) {
+                            alert(error.response.data.message);
+                            //유효하지 않은 값
+                        } else {
+                            console.log(response);
+                        }
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
                 })
                 .then(function () {
                 });
 
         }
 
-        function openCategorySelectPage () {
-            var categorySelectWindow = window.open(this.dataset.categorySelectUrl, '카테고리 선택', "resizable,scrollbars,status");
+        function openCategorySelectPage (categorySelectUrl) {
+            var categorySelectWindow = window.open(categorySelectUrl, '카테고리 선택', "resizable,scrollbars,status");
         }
+
+        function changeSearchedProductsCategory () {
+            var url_string = window.location.href;
+            var searchParams = new URLSearchParams(url_string);
+            console.log(document.getElementById("selectedCategoryForMultiProductUpdate").value);
+
+            var changeSearchedProductsCategoryFormData = new FormData();
+
+            for (var p of searchParams) {
+                if (p[0].indexOf('?') != -1) {
+                    var urlSplit = p[0].split('?', 2);
+                    p[0] = urlSplit[1];
+                }
+                //console.log(p[0] + ' : ' + p[1]);
+                changeSearchedProductsCategoryFormData.append(p[0], p[1]);
+            }
+
+            changeSearchedProductsCategoryFormData.append('selected_category_to_update_searched_products',
+                document.getElementById("selectedCategoryForMultiProductUpdate").value);
+
+            axios({
+                method: 'post',
+                url: '{{ route("update.category.searched.products") }}',
+                data: changeSearchedProductsCategoryFormData,
+                headers: { 'content-type': 'multipart/form-data' },
+            })
+                .then(function (response) {
+                    console.log(response);
+                    alert('상품의 카테고리가 성공적으로 변경되었습니다.');
+                    window.location.reload();
+                })
+                .catch(function (error) {
+                    if(error.response) {
+                        if (error.response.status == 403) {
+                            alert(error.response.data.message);
+                            //유효하지 않은 값
+                        } else {
+                            console.log(response);
+                        }
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                })
+                .then(function () {
+
+                });
+
+        }
+
+
+
 
     </script>
 @endsection
@@ -195,7 +266,10 @@
 <table cellpadding="10" class="table table-bordered text-center">
     <thead class="thead-light">
         <tr>
-            <th>상품번호</th>
+            <th>
+                상품번호
+                {{--<input type="checkbox" id="selectAllSearchedProduct" name="selectAllSearchedProduct" value="default" />--}}
+            </th>
             <th>상품명</th>
             <th>가격</th>
             <th>할인가</th>
@@ -247,7 +321,9 @@
 </table>
 
 <button class="btn btn-dark " role="button" id="productMultiDelete">일괄삭제</button>
-<button data-category-select-url="{{ route('categories.select') }}" class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
+<button data-checked-or-not="false" data-category-select-url="{{ route('categories.select') }}" class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
+<button data-checked-or-not="false" data-category-select-url="{{ route('categories.select') }}" class="btn btn-dark " role="button" id="searchedProductCategoryChange">검색된 전체 상품 카테고리 변경</button>
+
 
 <div class="pagination justify-content-center">
 {{ $products->appends($parameters)->links()}}
