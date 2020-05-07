@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('script_top')
+@section('script_bottom')
     @parent
     <script>
         function updateProduct() {
@@ -18,7 +18,7 @@
                 .then(function (response) {
                     if (response.data.success_fail_status && response.data.success_fail_status == 'success') {
                         alert('상품 수정 성공');
-                        window.location = '{{ route('products.index') }}';
+                        history.go(-1);
                     } else if (response.data.success_fail_status && response.data.success_fail_status == 'query_fail') {
                         alert('상품 수정 실패');
                         //history.go(-1);

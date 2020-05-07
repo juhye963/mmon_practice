@@ -168,7 +168,23 @@ Route::get('/empty-all', function () {
 
 Route::get('/test', function () {
 
-    dd( view('products.show-category-select')->getPath());
+    $product = App\Product::find(18964);
+    //dd(nltobr($product->updateLogs()->first()->log_description));
+    return nl2br($product->updateLogs()->first()->log_description);
+
+/*
+    $logs = App\Product::find(18964)->updateLogs()->with('seller')->orderBy('updated_at', 'desc')->limit(3)->get();
+    $data_set = [];
+
+    //dd($logs);
+    $i = 0;
+    foreach ($logs as $log) {
+        $data_set['seller'][$i] = $log->seller->name;
+        $data_set['description'][$i] = $log->log_description;
+        $i++;
+    }
+
+    dd($data_set);*/
 
     /*app('debugbar')->disable();
     print 'abc';*/

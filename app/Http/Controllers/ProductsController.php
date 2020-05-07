@@ -6,6 +6,7 @@ use App\Brand;
 use App\Category;
 use App\Product;
 use App\Seller;
+use App\UpdateLog;
 use http\Env\Response;
 use http\Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -27,18 +28,12 @@ class ProductsController extends Controller
 {
     public function create()
     {
-        //상품등록폼은 로그인상태에서만 올 수 있도록
-        //공식문서 : 현재 사용자의 승인 여부 결정하기
-        //https://laravel.kr/docs/6.x/authentication#protecting-routes
-
-        //나중에 여기에서 또쓰지 말고 카테고리컨트롤러와 공유할 수 있도록 바꾸기.. how? 생각
         $categories = Category::where('pid', '=', '0')->get();
         $product_status = [
             'selling' => '판매중',
             'stop_selling' => '판매중지',
             'sold_out' => '일시품절'
         ];
-        //상품상태는 나중에 @index에 있는 것과 공유하기
 
         return view('products.create')->with([
             'categories' => $categories,
@@ -118,8 +113,6 @@ class ProductsController extends Controller
             'sold_out' => '일시품절'
         ];
 
-
-        //dd(asset(Storage::url('12.png')));
         $products = Product::with('brand','category','seller');
 
         $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
@@ -154,7 +147,6 @@ class ProductsController extends Controller
         //검색키워드로 찾기
         //상품명으로 검색 아닐시에는 검색유형(relation)에서 name으로 검색하게됨
         if ($parameters['search_type'] == 'prds_nm') {
-            //더 좋은 방법 있을듯(계속 생각해보기)
             $products = $products->where('name', 'LIKE', '%' . $parameters['search_word'] . '%');
         } elseif ($parameters['search_type'] == 'seller_nm') {
             $products = $products->whereHas('seller', function (Builder $query) use ($parameters) {
@@ -168,13 +160,10 @@ class ProductsController extends Controller
             $products = $products;
         }
 
-        //체크박스!!
         if ($parameters['prds_status'] != []) {
             //dd(count($parameters['prds_status']));
             $products = $products->whereIn('status', $parameters['prds_status']);
         }
-
-        //like %%빼기
 
         //날짜검색 있을때
         // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
@@ -220,7 +209,6 @@ class ProductsController extends Controller
 
     public function edit($product_id) {
 
-        //dd($product_id);
         $current_seller_id = auth()->user()->id;
         $product = Product::find($product_id);
         if ($product == null) {
@@ -230,12 +218,7 @@ class ProductsController extends Controller
 
         if ($current_seller_id != $product_seller_id) {
             return Redirect::back()->withErrors(['수정권한이 없습니다.']);
-            // 리다이렉트 후에 $errors 변수가 자동으로 뷰에서 공유되어 손쉽게 사용자에게 보여질 수 있습니다.
-            // withErrors 메소드는 validator, MessageBag, 혹은 PHP array 를 전달 받습니다.
         }
-
-
-        //dd($product->name);
 
         $categories = Category::where('pid', '=', '0')->get();
         $product_status = [
@@ -253,8 +236,8 @@ class ProductsController extends Controller
 
     public function update(Request $request) {
 
-        //dd($request->product_id);
-        //dd($request->product_image instanceof UploadedFile); //undefined or  Illuminate\Http\UploadedFile
+        date_default_timezone_set('Asia/Seoul');
+
         $validatedData = $request->validate([
             'product_name' => 'required|max:255',
             'product_price' => 'required|digits_between:1,1000000',
@@ -274,32 +257,75 @@ class ProductsController extends Controller
             ]);
         }
 
-        $product_to_be_updated = Product::find($request->product_id);
-        try {
-            //좀 더 확실하게 input('이름')으로 -> 아래처럼하면 값 이미 있을수도 있음
-            $product_to_be_updated->name = $request->product_name;
-            $product_to_be_updated->price = $request->product_price;
-            $product_to_be_updated->discounted_price = $request->product_discounted_price;
-            $product_to_be_updated->stock = $request->product_stock;
-            $product_to_be_updated->seller_id = auth()->user()->id; //필요없지않아?
-            $product_to_be_updated->brand_id = auth()->user()->brand_id;
-            $product_to_be_updated->category_id = $request->sub_category_id;
-            $product_to_be_updated->status = $request->product_status;
+        $updated_product_data = $request->only(
+            'product_name',
+            'product_price',
+            'product_discounted_price',
+            'product_stock',
+            'sub_category_id',
+            'product_status'
+        );
 
+        $update_log_description = '';
+
+        $product_to_be_updated = Product::with(['category'])->find($request->input('product_id'));
+
+        $product_variable_name_set = [
+            'product_name' => ['column_name' => 'name', 'log_name' => '상품명'],
+            'product_price' => ['column_name' => 'price', 'log_name' => '상품가격'],
+            'product_discounted_price' => ['column_name' => 'discounted_price', 'log_name' => '할인가'],
+            'product_stock' => ['column_name' => 'stock', 'log_name' => '재고'],
+            'sub_category_id' => ['column_name' => 'category_id', 'log_name' => '카테고리'],
+            'product_status' => ['column_name' => 'status', 'log_name' => '판매상태'],
+        ];
+
+
+        foreach ($product_variable_name_set as $input_name => $value) {
+            $updated_data = $updated_product_data[$input_name];
+            $column_name = $value['column_name'];
+            $original_data = $product_to_be_updated->$column_name;
+
+            if ($input_name == 'sub_category_id' && $updated_data != $original_data) {
+
+                $original_category_name = $product_to_be_updated->category->name;
+                $updated_category_name = Category::find($updated_product_data['sub_category_id'])->name;
+                $update_log_description .= $value['log_name'] . " : " . $original_category_name . " -> " . $updated_category_name . "\n";
+                $product_to_be_updated->$column_name = $updated_data;
+
+            } else if ($updated_data != $original_data) {
+                $update_log_description .= $value['log_name'] . " : " . $original_data . " -> " . $updated_data . "\n";
+                $product_to_be_updated->$column_name = $updated_data;
+            }
+
+        }
+
+        $current_seller_id = auth()->user()->id;
+        $now = date("Y-m-d H:i:s");
+
+        $update_log = new UpdateLog();
+
+        try {
             $product_to_be_updated->save();
 
-            //여기 hasFile, validFile 말고 이거 쓴 이유 다시 생각해보기
+            $update_log::insert([
+                'seller_id' => $current_seller_id,
+                'product_id' => $product_to_be_updated->id,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'log_description' => $update_log_description,
+                'updated_at' => $now
+            ]);
+
             if ($request->product_image instanceof UploadedFile) {
                 $request->file('product_image')->storeAs('public/product_image', $request->product_id.'.png');
-                Cache::flush(); // update 한 새로운 이미지 가져오기 위해 캐시 삭제
+                Cache::flush();
+                // update 한 새로운 이미지 가져오기 위해 캐시 삭제
                 //php artisan config:cache 필요
             }
 
-            $success_fail_status = 'success' ; //이것들 나중에 상수로 정의?
+            $success_fail_status = 'success' ;
 
         } catch (QueryException $queryException) {
             $success_fail_status = 'query_fail';
-            //use Illuminate\Database\QueryException; 쓰지 않으면 여기에 걸리지 않음
         }
 
         return response()->json([
@@ -360,40 +386,36 @@ class ProductsController extends Controller
 
     }
 
-    public function makeRandomKoreanProductName() {
-        $product_name = [
-            'adjectives' => ['작은', '큰', '유행 안타는', '가벼운', '가성비 좋은', '일상적인', '힙한'],
-            'colors' => ['베이비핑크', '블랙', '네이비', '실버', '베이지', '로즈골드', '화이트골드', '카키'],
-            'items' => ['스니커즈', '샤프', '노트북', '지갑', '슬랙스', '셔츠', '가디건', '메모지', '코트', '패딩', '손난로', '다이어리']
-        ];
-
-        return Arr::random($product_name['adjectives'])
-            .' '. Arr::random($product_name['colors'])
-            .' '. Arr::random($product_name['items']);
-    }
-
     public function insertManyProducts() {
 
         app('debugbar')->disable();
         ini_set('max_execution_time', 3000);
         ini_set('memory_limit','512M');
 
+        $product = new Product();
         $productDataSet = [];
         $categories = Category::all();
         $sellers = Seller::where('brand_id', '!=', null)->get();
         $status_enum_value = array('selling', 'stop_selling', 'sold_out');
 
+
         for ($i = 0; $i < 100; $i++) {
             for ($j = 0; $j < 1000; $j++) {
 
                 $random_seller = $sellers->random(1)->first();
+
                 $random_price = rand(0, 1000000);
                 $random_discount_percentage = rand(0,100);
-                $discounted_price = $random_discount_percentage ? $random_price*($random_discount_percentage/100) : $random_price;
-                $date = date('Y-m-d H:i:s', mt_rand(0,time()));
+                $discounted_price = $random_price;
+                if ($random_discount_percentage != 0) {
+                    $discounted_price = $random_price * ($random_discount_percentage / 100);
+                }
+
+                $date_range_start = strtotime('-10 days');
+                $date = date('Y-m-d H:i:s', mt_rand($date_range_start, time()));
 
                 $productDataSet[$j] =  [
-                    'name' => $this->makeRandomKoreanProductName(),
+                    'name' => $product->makeRandomKoreanProductName(),
                     'price' => $random_price,
                     'discounted_price' => $discounted_price,
                     'seller_id' => $random_seller->id,
@@ -411,7 +433,7 @@ class ProductsController extends Controller
             dump("insert" . $i . " 번째. 메모리사용량(peak) : " . memory_get_peak_usage() . ", 메모리사용량(normal) : " . memory_get_usage() . ", 메모리사용량(true) : " . memory_get_peak_usage(true));
         }
 
-        return $j . "개의 데이터를 " . $i . "번 insert";
+        return "done";
     }
 
     public function selectCategoryToUpdateSelectedProduct()
@@ -476,7 +498,6 @@ class ProductsController extends Controller
             $request->validate([
                 'start_date' => 'required|date|before_or_equal:end_date',
                 'end_date' => 'required|date|before_or_equal:today',
-
             ]);
         }
 

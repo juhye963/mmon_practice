@@ -190,16 +190,11 @@
                 .then(function () {
 
                 });
-
         }
-
-
-
-
     </script>
 @endsection
 
-@section('content')
+
 <h1>전체상품 조회 영역입니다.</h1>
 
 <p>총 {{ $products->total() }} 개의 상품이 조회되었습니다.</p>
@@ -259,6 +254,8 @@
 </form>
 </div>
 
+
+
 <div id = "selectedCategoryForMultiProductUpdateArea">
     <input type="hidden" value="default" id="selectedCategoryForMultiProductUpdate">
 </div>
@@ -279,6 +276,7 @@
             <th>등록자</th>
             <th>등록일</th>
             <th>상태</th>
+            <th>상품수정이력</th>
             <th>상품삭제</th>
             <th>상품수정</th>
         </tr>
@@ -313,6 +311,16 @@
             <td>{{ $product->seller->name }}</td>
             <td>{{ $product->created_at }}</td>
             <td>{{ $product->status }}</td>
+            <td>
+                {{ $i = 1 }}
+                @foreach($product->updateLogs as $log)
+                    *<b>{{ $log->updated_at }}</b>
+                    {{ "$log->log_description" }} <br>
+                    @if($i++ == 3)
+                        @break
+                    @endif
+                @endforeach
+            </td>
             <td><button data-delete-url="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn-remove" role="button">삭제</button></td>
 {{--            <td><a href="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</a></td>--}}
             <td><a class="btn btn-light" href="{{ route('products.edit', ['product_id' => $product->id]) }}" role="button">수정</a></td>
@@ -321,7 +329,7 @@
 </table>
 
 <button class="btn btn-dark " role="button" id="productMultiDelete">일괄삭제</button>
-<button data-checked-or-not="false" data-category-select-url="{{ route('categories.select') }}" class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
+<button data-checked-or-not="false" data-category-select-url="{{ route('categories.select') }}?type=select" class="btn btn-dark " role="button" id="selectedProductCategoryChange">선택 상품 카테고리 변경</button>
 <button data-checked-or-not="false" data-category-select-url="{{ route('categories.select') }}" class="btn btn-dark " role="button" id="searchedProductCategoryChange">검색된 전체 상품 카테고리 변경</button>
 
 
@@ -329,4 +337,4 @@
 {{ $products->appends($parameters)->links()}}
 </div>
 
-@endsection
+

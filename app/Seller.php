@@ -34,4 +34,9 @@ class Seller extends Authenticatable
     {
         return $this->hasMany(Product::class,'seller_id');
     }
+
+    public function updateLogs()
+    {
+        return $this->hasMany(UpdateLog::class,'seller_id');
+    }
 }
