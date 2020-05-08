@@ -53,11 +53,6 @@ Route::post('/login', [
 ]);
 
 
-//브랜드명 확인하는 곳
-/*Route::get('/brands',[
-    'as' => 'brands',
-    'uses' => 'BrandsController@index'
-]);*/
 /*셀러의 브랜드 수정*/
 Route::get('/seller/brands/edit', [
     'as' => 'seller.brand.edit',
@@ -89,6 +84,11 @@ Route::get('/products/index', [
 Route::post('/products/image-upload', [
     'as' => 'products.image-upload',
     'uses' => 'ProductsController@imageUpload'
+]);
+
+Route::get('/products/all-update-log/{product_id}', [
+    'as' => 'product.all.update.log',
+    'uses' => 'ProductsController@showAllUpdateLogs'
 ]);
 
 /* 상품 삭제 /{product_id}*/
@@ -133,10 +133,35 @@ Route::post('/update-searched-product', [
 
 /*카테고리*/
 
-Route::get('/categories/display-sub-categories',[
+Route::get('/categories/display-sub-categories', [
     'as' => 'categories.display-sub-categories',
     'uses' => 'CategoriesController@displaySubCategories'
 ]);
+
+
+/*브랜드 할인*/
+
+Route::get('/brand-discount-list', [
+    'as' => 'brand.discount.list',
+    'uses' => 'BrandsController@listBrandDiscounts'
+]);
+
+Route::get('/brand-discount-create', [
+    'as' => 'brand.discount.create',
+    'uses' => 'BrandsController@createBrandDiscount'
+]);
+
+Route::post('/brand-discount-store', [
+    'as' => 'brand.discount.store',
+    'uses' => 'BrandsController@storeBrandDiscount'
+]);
+
+Route::get('/brand-discount-target-product', [
+   'as' => 'brand.discount.target.product',
+    'uses' => 'BrandsController@showTargetProductOfBrandDiscount'
+]);
+
+
 
 
 
@@ -155,9 +180,11 @@ Route::get('/empty-all', function () {
 
     //App\Seller::truncate();
 
-    App\Category::truncate();
+    //App\Category::truncate();
 
-    App\Product::truncate();
+    //App\Product::truncate();
+
+    App\UpdateLog::truncate();
 
 
     if (config('database.default') !== 'sqlite') {
@@ -169,8 +196,10 @@ Route::get('/empty-all', function () {
 Route::get('/test', function () {
 
     $product = App\Product::find(18964);
-    //dd(nltobr($product->updateLogs()->first()->log_description));
-    return nl2br($product->updateLogs()->first()->log_description);
+    $description = $product->updateLogs()->first()->log_description;
+    dd(str_replace('\n', '<br>', $description));
+    //dd(nl2br($product->updateLogs()->first()->log_description));
+    //return nl2br(e($product->updateLogs()->first()->log_description));
 
 /*
     $logs = App\Product::find(18964)->updateLogs()->with('seller')->orderBy('updated_at', 'desc')->limit(3)->get();

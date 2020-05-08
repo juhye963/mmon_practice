@@ -9,10 +9,16 @@
 @section('script_bottom')
     <script>
         var selectAllButton = document.querySelectorAll('.btn.btn-light.btn-remove');
-        //console.log(selectAllButton.length);
         for (var i = 0; i < selectAllButton.length; i++) {
             selectAllButton[i].addEventListener('click', deleteThisProduct);
         }
+
+        var productUpdateLogsPopupButton = document.querySelectorAll('.btn.btn-primary.update-log-popup');
+        //console.log(productUpdateLogsPopupButton.length);
+        for (var i = 0; i < productUpdateLogsPopupButton.length; i++) {
+            productUpdateLogsPopupButton[i].addEventListener('click', openProductUpdateLogsPopup);
+        }
+
 
         document.getElementById('productMultiDelete').addEventListener('click', deleteCheckedProducts);
         document.getElementById('selectedProductCategoryChange').addEventListener('click', function () {
@@ -24,9 +30,13 @@
             openCategorySelectPage(this.dataset.categorySelectUrl)
         });
 
+        function openProductUpdateLogsPopup(_event) {
+            _event.preventDefault();
+            window.open(this.href, '상품 수정 전체내역', 'width=1000,height=700');
+        }
+
         function deleteThisProduct(_event) {
-            //_event.preventDefault(); a 태그에서 button 태그로 바꿨으니까 필요 없음
-            console.log('삭제주소 : '+this.dataset.deleteUrl);
+            console.log('삭제주소 : ' + this.dataset.deleteUrl);
             var productDeleteUrl = this.dataset.deleteUrl;
 
             axios.delete(productDeleteUrl)
@@ -146,16 +156,21 @@
         function changeSearchedProductsCategory () {
             var url_string = window.location.href;
             var searchParams = new URLSearchParams(url_string);
-            console.log(document.getElementById("selectedCategoryForMultiProductUpdate").value);
+            //console.log(document.getElementById("selectedCategoryForMultiProductUpdate").value);
 
             var changeSearchedProductsCategoryFormData = new FormData();
 
             for (var p of searchParams) {
+                //console.log(p[0] + ' : ' + p[1]);
+                //p[0]은 파라미터 이름, p[1]에는 파라미터 값이 들어있음
+                //첫번째 파라미터이름은 url 부분을 포함한다.
+                //http://board-test.localhost/products/index?search_type : seller_nm
+                // ?을 기준으로 2개의 문자열로 나눠서 정확한 파라미터 이름을 구한다.
+                //파라미터 이름에 ?이 포함되어있으면 첫번째 파라미터이다.
                 if (p[0].indexOf('?') != -1) {
                     var urlSplit = p[0].split('?', 2);
                     p[0] = urlSplit[1];
                 }
-                //console.log(p[0] + ' : ' + p[1]);
                 changeSearchedProductsCategoryFormData.append(p[0], p[1]);
             }
 
@@ -170,14 +185,13 @@
             })
                 .then(function (response) {
                     console.log(response);
-                    alert('상품의 카테고리가 성공적으로 변경되었습니다.');
-                    window.location.reload();
+                    //alert('상품의 카테고리가 성공적으로 변경되었습니다.');
+                    //window.location.reload();
                 })
                 .catch(function (error) {
                     if(error.response) {
-                        if (error.response.status == 403) {
+                        if (error.response.status == 422) {
                             alert(error.response.data.message);
-                            //유효하지 않은 값
                         } else {
                             console.log(response);
                         }
@@ -188,9 +202,10 @@
                     }
                 })
                 .then(function () {
-
                 });
+
         }
+
     </script>
 @endsection
 
@@ -200,15 +215,6 @@
 <p>총 {{ $products->total() }} 개의 상품이 조회되었습니다.</p>
 
 @include('errors.validate')
-
-{{--@if (\Session::has('success'))
-    <div class="alert alert-success">
-        <ul>
-            <li>{!! \Session::get('success') !!}</li>
-        </ul>
-    </div>
-@endif--}}
-
 
 <a class="btn btn-dark" data-toggle="collapse" href="#collapseSearchForm">검색하기</a>
 <div class="collapse" id="collapseSearchForm">
@@ -263,10 +269,7 @@
 <table cellpadding="10" class="table table-bordered text-center">
     <thead class="thead-light">
         <tr>
-            <th>
-                상품번호
-                {{--<input type="checkbox" id="selectAllSearchedProduct" name="selectAllSearchedProduct" value="default" />--}}
-            </th>
+            <th>상품번호</th>
             <th>상품명</th>
             <th>가격</th>
             <th>할인가</th>
@@ -298,7 +301,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <img src="{{ $product->product_image_path }}" class="img-thumbnail">
+                            <img src="{{--{{ $product->product_image_path }}--}}" class="img-thumbnail">
                         </div>
                     </div>
                 </div>
@@ -318,28 +321,19 @@
                         @break
                     @endif
                     <li>
-                        <b>{{ $product->updateLogs[$i]->updated_at }}</b>
-                        {{ $product->updateLogs[$i]->log_description }}
+                        <b>{{ $product->updateLogs[$i]->updated_at }}</b><br>
+                        <pre>{{ $product->updateLogs[$i]->log_description }}</pre>
                     </li>
                 @endfor
 
-                @if ($product->updateLogs->count() > 0)
-                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseMoreUpdateLogs{{ $product->id }}" role="button" aria-expanded="false" aria-controls="collapseMoreUpdateLogs">
-                        더보기
-                    </a>
-                    <div class="collapse" id="collapseMoreUpdateLogs{{ $product->id }}">
-                        @for ($i = 3; $i < $product->updateLogs->count(); $i++)
-                            <li>
-                                <b>{{ $product->updateLogs[$i]->updated_at }}</b>
-                                {{ $product->updateLogs[$i]->log_description }}
-                            </li>
-                        @endfor
-                    </div>
+                @if($product->updateLogs->count() > 0)
+                    <a class="btn btn-primary update-log-popup" href="{{ route('product.all.update.log', ['product_id' => $product->id]) }}" role="button">전체 로그보기</a>
+                    @else
+                    <p>업데이트 내역이 없습니다.</p>
                 @endif
 
             </td>
             <td><button data-delete-url="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn-remove" role="button">삭제</button></td>
-{{--            <td><a href="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</a></td>--}}
             <td><a class="btn btn-light" href="{{ route('products.edit', ['product_id' => $product->id]) }}" role="button">수정</a></td>
         </tr>
     @endforeach

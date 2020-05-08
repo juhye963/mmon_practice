@@ -52,11 +52,6 @@ class SellersController extends Controller
 
     public function store(Request $request)
     {
-        //$test = $request->input('name');
-        //$test = $request->input('email');
-        //$test = $request->input('brand_id');
-        //dd($test);
-
         $validatedData = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:mall_sellers,email', //unique 검사란??

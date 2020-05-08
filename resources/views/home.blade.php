@@ -5,5 +5,6 @@
 <button><a href="{{ route('sessions.destroy') }}">로그아웃</a></button>
 <button><a href="{{ route('products.create') }}">상품등록</a></button>
 <button><a href="{{ route('products.index') }}">상품조회</a></button>
+<button><a href="{{ route('brand.discount.create') }}">브랜드할인 등록</a></button>
+<button><a href="{{ route('brand.discount.list') }}">브랜드할인 목록 보기</a></button>
 
-<!--직접 컨트롤러와 연결x 라우트 이름과 연결하기 = 확장성 좋아짐-->

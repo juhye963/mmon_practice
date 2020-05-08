@@ -43,10 +43,12 @@ class ProductsController extends Controller
 
     public function store(Request $request)
     {
+
+        //dd(gettype($request->input('product_price')));
         $validatedData = $request->validate([
             'product_name' => 'required|max:255',
-            'product_price' => 'required|digits_between:1,1000000',
-            'product_discounted_price' => 'required|digits_between:1,1000000|lte:product_price',
+            'product_price' => 'required|min:0|max:1000000',
+            'product_discounted_price' => 'required|min:0|max:1000000|lte:product_price',
             'product_stock' => 'required|min:0|max:1000',
             'category_pid' => 'required:sub_category_id|exists:mall_categories,id',
             'sub_category_id' => 'required_with:category_pid|exists:mall_categories,id',
@@ -54,8 +56,10 @@ class ProductsController extends Controller
                 'required',
                 Rule::in(['selling', 'stop_selling', 'sold_out']),
             ],
-            'product_image' => 'file|image'
+            //'product_image' => 'file|image'
         ]);
+
+        dd('hi');
 
         $product = new Product();
 
@@ -79,11 +83,7 @@ class ProductsController extends Controller
 
         } catch (QueryException $queryException) {
             $success_fail_status = 'query_fail';
-            //use Illuminate\Database\QueryException; 쓰지 않으면 여기에 걸리지 않음
         }
-        //어느 예외가 더 큰건지 찾아보기(laravel api문서?)
-        //두 예외가 모두 일어나는 상황에서 ErrorException이 먼저 걸림 = 이게 더 작은가?
-        //auth middleware로 접근 막아서 비로그인 상태에서 나는 ErrorException 예외 안뜨도록 하고 캐치하지 않는걸로 바꿈
 
         return response()->json([
             'success_fail_status' => $success_fail_status
@@ -207,6 +207,11 @@ class ProductsController extends Controller
         ]);
     }
 
+    public function showAllUpdateLogs($product_id) {
+        $productUpdateLogsAll = Product::with('seller')->find($product_id)->updateLogs;
+        return view('products.show-all-update-logs-of-product', ['product_update_logs_all' => $productUpdateLogsAll]);
+    }
+
     public function edit($product_id) {
 
         $current_seller_id = auth()->user()->id;
@@ -240,9 +245,9 @@ class ProductsController extends Controller
 
         $validatedData = $request->validate([
             'product_name' => 'required|max:255',
-            'product_price' => 'required|digits_between:1,1000000',
-            'product_discounted_price' => 'required|digits_between:1,1000000|lte:product_price',
-            'product_stock' => 'required|min:0|max:1000',
+            'product_price' => 'required|numeric|min:1|max:1000000',
+            'product_discounted_price' => 'required|numeric|min:1|max:1000000|lte:product_price',
+            'product_stock' => 'required|numeric|min:0|max:100000',
             'category_pid' => 'required:sub_category_id|exists:mall_categories,id',
             'sub_category_id' => 'required_with:category_pid|exists:mall_categories,id',
             'product_status' => [
@@ -289,11 +294,11 @@ class ProductsController extends Controller
 
                 $original_category_name = $product_to_be_updated->category->name;
                 $updated_category_name = Category::find($updated_product_data['sub_category_id'])->name;
-                $update_log_description .= $value['log_name'] . " : " . $original_category_name . " -> " . $updated_category_name . "\n";
+                $update_log_description .= $value['log_name'] . " : " . $original_category_name . " -> " . $updated_category_name . chr(10);
                 $product_to_be_updated->$column_name = $updated_data;
 
             } else if ($updated_data != $original_data) {
-                $update_log_description .= $value['log_name'] . " : " . $original_data . " -> " . $updated_data . "\n";
+                $update_log_description .= $value['log_name'] . " : " . $original_data . " -> " . $updated_data . chr(10);
                 $product_to_be_updated->$column_name = $updated_data;
             }
 
@@ -469,8 +474,6 @@ class ProductsController extends Controller
 
     public function changeCategoryOfSearchedProducts(Request $request) {
 
-        //dd($request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date', 'selected_category_to_update_searched_products'));
-
         $products = Product::with('brand','category','seller');
 
         $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date', 'selected_category_to_update_searched_products');
@@ -525,16 +528,12 @@ class ProductsController extends Controller
             $products = $products->whereIn('status', $parameters['prds_status']);
         }
 
-        //like %%빼기
-
         //날짜검색 있을때
         // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
         if ($parameters['start_date'] != '' && $parameters['end_date'] != '' ) {
             $start_date = date('Y-m-d H:i:s', strtotime($parameters['start_date']));
             //dd($start_date);
             $end_date = date('Y-m-d H:i:s', strtotime("+1 days -1 second", strtotime($parameters['end_date'])));
-            //dd($end_date);
-            //23:59:59 종료일 포함시키지 않는 문제 해결
             //dd ($parameters['end_date']);
             $products = $products->whereBetween('created_at', [$start_date, $end_date]);
         }
@@ -556,6 +555,10 @@ class ProductsController extends Controller
             default :
                 $products = $products->orderByDesc('id');
                 break;
+        }
+
+        foreach ($products->get() as $product) {
+            dump($product->id);
         }
 
         $products->update(['category_id' => $parameters['selected_category_to_update_searched_products']]);
