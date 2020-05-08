@@ -312,14 +312,31 @@
             <td>{{ $product->created_at }}</td>
             <td>{{ $product->status }}</td>
             <td>
-                {{ $i = 1 }}
-                @foreach($product->updateLogs as $log)
-                    *<b>{{ $log->updated_at }}</b>
-                    {{ "$log->log_description" }} <br>
-                    @if($i++ == 3)
+
+                @for ($i = 0; $i < 3; $i++)
+                    @if ($product->updateLogs->count() <= 0 || empty($product->updateLogs[$i]))
                         @break
                     @endif
-                @endforeach
+                    <li>
+                        <b>{{ $product->updateLogs[$i]->updated_at }}</b>
+                        {{ $product->updateLogs[$i]->log_description }}
+                    </li>
+                @endfor
+
+                @if ($product->updateLogs->count() > 0)
+                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseMoreUpdateLogs{{ $product->id }}" role="button" aria-expanded="false" aria-controls="collapseMoreUpdateLogs">
+                        더보기
+                    </a>
+                    <div class="collapse" id="collapseMoreUpdateLogs{{ $product->id }}">
+                        @for ($i = 3; $i < $product->updateLogs->count(); $i++)
+                            <li>
+                                <b>{{ $product->updateLogs[$i]->updated_at }}</b>
+                                {{ $product->updateLogs[$i]->log_description }}
+                            </li>
+                        @endfor
+                    </div>
+                @endif
+
             </td>
             <td><button data-delete-url="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn-remove" role="button">삭제</button></td>
 {{--            <td><a href="{{ route("products.destroy", $product->id) }}" class="btn btn-light btn_remove" role="button">삭제</a></td>--}}
