@@ -113,7 +113,7 @@ class ProductsController extends Controller
             'sold_out' => '일시품절'
         ];
 
-        $products = Product::with('brand','category','seller');
+        $products = Product::with('brand','category','seller','updateLogs');
 
         $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
 
