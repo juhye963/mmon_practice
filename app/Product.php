@@ -17,6 +17,8 @@ class Product extends Model
         'name', 'price', 'discounted_price', 'stock', 'seller_id', 'brand_id', 'category_id', 'status'
     ];
 
+    protected $with = ['brand.brandProductDiscount'];
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -40,41 +42,6 @@ class Product extends Model
     public function getProductImagePathAttribute()
     {
         return asset(Storage::url('product_image/'.$this->id.'.png'));
-    }
-
-    public function getRecentUpdateLogData()
-    {
-        $limit_number = 3;
-
-        $RecentUpdateLogs = $this
-            ->updateLogs()
-            ->with('seller')
-            ->orderBy('updated_at', 'desc')
-            ->limit($limit_number)->get();
-
-        $updateLogData = [];
-
-        /*$i = 0;
-        foreach($RecentUpdateLogs as $log) {
-            $updateLogData[$i]['seller'] = $log->seller->name;
-            $updateLogData[$i]['ip_address'] = $log->ip_address;
-            $updateLogData[$i]['log_description'] = $log->log_description;
-            $updateLogData[$i]['updated_at'] = $log->updated_at;
-            $i++;
-        }*/
-
-        $i = 0;
-        foreach($RecentUpdateLogs as $log) {
-            $updateLogData[$i] = "";
-            $updateLogData[$i] .= "변경자 : " . $log->seller->name . "\n";
-            $updateLogData[$i] .= "ip 주소 : " . $log->ip_address . "\n";
-            $updateLogData[$i] .= "변경내용 : " . $log->log_description . "\n";
-            $updateLogData[$i] .= "변경일시 : " . $log->updated_at . "\n";
-            $i++;
-        }
-
-        return $updateLogData;
-
     }
 
     public function makeRandomKoreanProductName() {

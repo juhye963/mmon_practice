@@ -1,4 +1,6 @@
 <?php
+
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 /*
 |--------------------------------------------------------------------------
@@ -161,6 +163,15 @@ Route::get('/brand-discount-target-product', [
     'uses' => 'BrandsController@showTargetProductOfBrandDiscount'
 ]);
 
+Route::get('/brand-discount-edit/{brand_discount_id}', [
+    'as' => 'brand.discount.edit',
+    'uses' => 'BrandsController@editBrandDiscount'
+]);
+
+Route::post('/brand-discount-update', [
+   'as' => 'brand.discount.update',
+   'uses' => 'BrandsController@updateBrandDiscount'
+]);
 
 
 
@@ -184,7 +195,9 @@ Route::get('/empty-all', function () {
 
     //App\Product::truncate();
 
-    App\UpdateLog::truncate();
+    //App\UpdateLog::truncate();
+
+    App\BrandProductDiscount::truncate();
 
 
     if (config('database.default') !== 'sqlite') {
@@ -195,11 +208,26 @@ Route::get('/empty-all', function () {
 
 Route::get('/test', function () {
 
+
+    //dd(\App\Product::find(180)->getMostRecentBrandDiscount()->discount_percentage);
+
+   /* $targetProductsOfBrandDiscount = App\Brand::find(2)->products
+        ->where('price', '>=', 200)->all();
+
+    $discount_percentage = 20/100;
+
+    foreach ($targetProductsOfBrandDiscount as $targetProduct) {
+        $targetProduct->discounted_price = $targetProduct->price * $discount_percentage;
+    }*/
+
+   /* $test = \App\BrandProductDiscount::find(3)->getTotalCountOfDiscountTargetProducts();
+    dd($test);*/
+/*
     $product = App\Product::find(18964);
     $description = $product->updateLogs()->first()->log_description;
     dd(str_replace('\n', '<br>', $description));
     //dd(nl2br($product->updateLogs()->first()->log_description));
-    //return nl2br(e($product->updateLogs()->first()->log_description));
+    //return nl2br(e($product->updateLogs()->first()->log_description));*/
 
 /*
     $logs = App\Product::find(18964)->updateLogs()->with('seller')->orderBy('updated_at', 'desc')->limit(3)->get();

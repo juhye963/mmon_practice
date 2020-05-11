@@ -12,6 +12,7 @@ class Brand extends Model
 
     protected $fillable = ['name'];
 
+
     public $timestamps = false;
 
     public function sellers()
@@ -27,6 +28,14 @@ class Brand extends Model
     public function brandProductDiscounts()
     {
         return $this->hasMany(BrandProductDiscount::class,'brand_id');
+    }
+
+    public function brandProductDiscount()
+    {
+        return $this->hasOne(BrandProductDiscount::class,'brand_id')
+            ->where('start_date', '<=', today())
+            ->where('end_date', '>=', today())
+            ->orderByDesc('id');
     }
 
 }

@@ -24,10 +24,12 @@
                 <td>{{ $discount->brand->name }}</td>
                 <td>{{ $discount->from_price }}</td>
                 <td>{{ $discount->discount_percentage }}</td>
-                <td>해당상품수</td>
+                <td>{{ $discount->getTotalCountOfDiscountTargetProducts() }}</td>
                 <td>{{ $discount->start_date }}</td>
                 <td>{{ $discount->end_date }}</td>
-                <td>수정삭제버튼</td>
+                <td>
+                    <a role="button" href="{{ route('brand.discount.edit', ['brand_discount_id' => $discount->id]) }}" id="brandDiscountEdit"{{$discount->id}} class="btn btn-light">수정</a>
+                </td>
             </tr>
         @endforeach
 

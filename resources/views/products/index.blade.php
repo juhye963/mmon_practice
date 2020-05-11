@@ -307,7 +307,15 @@
                 </div>
             </div>
             <td>{{ $product->price }} 원</td>
-            <td>{{ $product->discounted_price }} 원</td>
+            <td>
+                @if($product->brand->brandProductDiscount == null || $product->price < $product->brand->brandProductDiscount->from_price)
+                    {{ $product->discounted_price }} 원
+                @elseif($product->brand->brandProductDiscount->discount_percentage == 0)
+                    {{ $product->price }}
+                @else
+                    {{ $product->price * ($product->brand->brandProductDiscount->discount_percentage/100) }}
+                @endif
+            </td>
             <td>{{ $product->stock }}</td>
             <td>{{ $product->brand->name }}</td>
             <td>{{ $product->category->name }}</td>

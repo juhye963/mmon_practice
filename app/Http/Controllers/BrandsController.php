@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Brand;
 use App\BrandProductDiscount;
+use App\Product;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use function MongoDB\BSON\toJSON;
 
 //use Illuminate\Database\Eloquent\Model as Model;
 
@@ -21,16 +23,18 @@ class BrandsController extends Controller
 
     public function insertManyBrands() {
 
-        $brands_name_suffix = ['Apple', 'Google', 'Coca-Cola', 'Microsoft', 'Toyota', 'IBM', 'Samsung', 'Amazon', 'Mercedes-Benz', 'GE'];
-        $brands_name_prefix = ['BMW', 'McDonald\'s', 'Disney', 'Intel', 'Facebook', 'Cisco', 'Oracle', 'Nike', 'Louis Vuitton', 'H&M'];
 
-        //dd(Arr::random($brands_name_prefix).' & '.Arr::random($brands_name_suffix));
+        $brands_name_prefix = ['BMW', 'McDonald\'s', 'Disney', 'Intel', 'Facebook', 'Cisco', 'Oracle', 'Nike', 'Louis Vuitton', 'H&M'];
+        $brands_name_middle = ['Honda', 'SAP', 'Pepsi', 'Gillette', 'American Express', 'IKEA', 'Zara', 'Pampers', 'UPS', 'Budweiser'];
+        $brands_name_suffix = ['Apple', 'Google', 'Coca-Cola', 'Microsoft', 'Toyota', 'IBM', 'Samsung', 'Amazon', 'Mercedes-Benz', 'GE'];
 
         $brands_data_set = [];
 
         for ($i = 0; $i < 200; $i++) {
-            $random_brand_name = Arr::random($brands_name_prefix).' & '.Arr::random($brands_name_suffix);
-            if (Brand::where('name', '=', $random_brand_name)->first() != null) {
+            $random_brand_name = Arr::random($brands_name_prefix)
+                . ' & ' . Arr::random($brands_name_middle)
+                . ' & ' . Arr::random($brands_name_suffix);
+            if (in_array($random_brand_name, $brands_data_set)) {
                 $i--;
                 continue;
             }
@@ -45,7 +49,8 @@ class BrandsController extends Controller
     }
 
     public function listBrandDiscounts() {
-        $brand_product_discount_lists = BrandProductDiscount::all();
+
+        $brand_product_discount_lists = BrandProductDiscount::all()->sortKeysDesc();
         return view('brands.discount-list', ['brand_product_discount_lists' => $brand_product_discount_lists]);
     }
 
@@ -57,6 +62,8 @@ class BrandsController extends Controller
 
     public function storeBrandDiscount(Request $request) {
 
+        $request->input('discount_target_min_price', '0');
+
         $validatedData = $request->validate([
             'discount_target_brand_id' => 'required|exists:mall_brands,id',
             'discount_percentage' => 'required|numeric|min:0|max:99',
@@ -65,7 +72,12 @@ class BrandsController extends Controller
             'discount_end_date' => 'required|date'
         ]);
 
-        $brand_discount_data = $request->only('discount_target_brand_id', 'discount_percentage', 'discount_target_min_price', 'discount_start_date', 'discount_end_date');
+        $brand_discount_data = $request->only(
+            'discount_target_brand_id',
+            'discount_percentage',
+            'discount_target_min_price',
+            'discount_start_date',
+            'discount_end_date');
 
         $brand_discount = new BrandProductDiscount();
 
@@ -82,22 +94,59 @@ class BrandsController extends Controller
 
     public function showTargetProductOfBrandDiscount(Request $request) {
 
-        $parameters['discount_target_brand_id'] = $request->input('discount_target_brand_id', '');
-        $parameters['discount_target_min_price'] = $request->input('discount_target_min_price', '');
-
-
-
         $request->validate([
             'discount_target_brand_id' => 'required|exists:mall_brands,id',
-            'discount_target_min_price' => 'required',
+            'discount_target_min_price' => 'required|min:0|max:1000000',
         ]);
 
+        $parameters['discount_target_brand_id'] = $request->input('discount_target_brand_id', '');
+        $parameters['discount_target_min_price'] = $request->input('discount_target_min_price', 0);
 
-        /*$targetProductsOfBrandDiscount = Brand::find($parameters['discount_target_brand_id'])->products
-            ->where('price', '>=', $parameters['discount_target_min_price'])->paginate(5);
+        $targetProductsOfBrandDiscount = Product::where('brand_id', $parameters['discount_target_brand_id'])
+            ->where('price', '>=', $parameters['discount_target_min_price'])->paginate(10);
+        $targetProductsOfBrandDiscount->appends($parameters);
+        //dd($targetProductsOfBrandDiscount);
 
+        return response()->json(['targetProducts' => $targetProductsOfBrandDiscount]);
+    }
 
-        return view('brands.discount-target-products-index', ['products' => $targetProductsOfBrandDiscount]);*/
+    public function editBrandDiscount ($brand_discount_id) {
+
+        $brand_discount_data = BrandProductDiscount::find($brand_discount_id);
+
+        return view('brands.edit-discount')->with([
+            'brand_discount_data' => $brand_discount_data,
+        ]);
+    }
+
+    public function updateBrandDiscount (Request $request) {
+        $validatedData = $request->validate([
+            'brand_discount_id' => 'required|exists:mall_brand_products_discount,id',
+            'discount_percentage' => 'required|numeric|min:0|max:99',
+            'discount_target_min_price' => 'required|numeric|min:0|max:1000000',
+            'discount_start_date' => 'required|date|before_or_equal:discount_end_date',
+            'discount_end_date' => 'required|date'
+        ]);
+
+        $brand_discount_update_data = $request->only(
+            'brand_discount_id',
+            'discount_percentage',
+            'discount_target_min_price',
+            'discount_start_date',
+            'discount_end_date');
+
+        BrandProductDiscount::find($brand_discount_update_data['brand_discount_id'])->update([
+            'from_price' => $brand_discount_update_data['discount_target_min_price'],
+            'discount_percentage' => $brand_discount_update_data['discount_percentage'],
+            'start_date' => $brand_discount_update_data['discount_start_date'],
+            'end_date' => $brand_discount_update_data['discount_end_date']
+        ]);
+
+        return response()->json([]);
+    }
+
+    public function applyBrandDiscount () {
+
     }
 
 }

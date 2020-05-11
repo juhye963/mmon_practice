@@ -29,8 +29,11 @@
                 }
             })
             .catch(function (error) {
-                if (error.response && error.response.status === 422) {
-                    alert(Object.values(error.response.data.errors)[0]);
+                if (error.response) {
+                    console.log(error.response);
+                    if ( error.response.status === 422 ) {
+                        alert(Object.values(error.response.data.errors)[0]);
+                    }
                 } else if (error.request) {
                     console.log(error.request);
                 } else {

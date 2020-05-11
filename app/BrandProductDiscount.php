@@ -15,4 +15,14 @@ class BrandProductDiscount extends Model
         return $this->belongsTo(Brand::class,'brand_id');
     }
 
+    public function getTotalCountOfDiscountTargetProducts () {
+        $min_price_of_target = $this->from_price;
+        $brand_id = $this->brand_id;
+
+        $target_products_total_count = Brand::find($brand_id)->products->where('price', '>=', $min_price_of_target)->count();
+
+        return $target_products_total_count;
+    }
+
+
 }

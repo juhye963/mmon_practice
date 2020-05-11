@@ -169,11 +169,7 @@ class ProductsController extends Controller
         // 위에서 하나라도 공백이 아닐시에는 required 로 조건 맞춰줌. = 둘 다 공백이거나 둘 다 값이 있는 상태가 됨
         if ($parameters['start_date'] != '' && $parameters['end_date'] != '' ) {
             $start_date = date('Y-m-d H:i:s', strtotime($parameters['start_date']));
-            //dd($start_date);
             $end_date = date('Y-m-d H:i:s', strtotime("+1 days -1 second", strtotime($parameters['end_date'])));
-            //dd($end_date);
-            //23:59:59 종료일 포함시키지 않는 문제 해결
-            //dd ($parameters['end_date']);
             $products = $products->whereBetween('created_at', [$start_date, $end_date]);
         }
 
@@ -196,7 +192,9 @@ class ProductsController extends Controller
                 break;
         }
 
-        $products = $products->paginate(5);
+        //dd($products);
+        $products = $products->paginate(20);
+
 
         return view('products.index')->with([
             'products' => $products,
@@ -400,12 +398,13 @@ class ProductsController extends Controller
         $product = new Product();
         $productDataSet = [];
         $categories = Category::all();
+        //$category = Category::first();
         $sellers = Seller::where('brand_id', '!=', null)->get();
         $status_enum_value = array('selling', 'stop_selling', 'sold_out');
 
 
         for ($i = 0; $i < 100; $i++) {
-            for ($j = 0; $j < 1000; $j++) {
+            for ($j = 0; $j < 100; $j++) {
 
                 $random_seller = $sellers->random(1)->first();
 
@@ -427,7 +426,9 @@ class ProductsController extends Controller
                     'stock' => rand(0, 16777215),
                     'status' => Arr::random($status_enum_value),
                     'category_id' => $categories->random(1)->first()->id,
+                    //'category_id' => $category->id,
                     'brand_id' => $random_seller->brand_id,
+                    //'brand_id' => Brand::first()->id,
                     'created_at' => $date,
                     'updated_at' => $date
                 ];
