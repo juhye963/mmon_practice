@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Brand;
 use App\BrandProductDiscount;
 use App\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -50,7 +51,10 @@ class BrandsController extends Controller
 
     public function listBrandDiscounts() {
 
-        $brand_product_discount_lists = BrandProductDiscount::all()->sortKeysDesc();
+        /*$brand_product_discount_lists = BrandProductDiscount::withCount(['products' => function (Builder $query) {
+            $query->where('price', '=>', );
+        }])->get();*/
+        $brand_product_discount_lists = BrandProductDiscount::all()->loadCount('products');
         return view('brands.discount-list', ['brand_product_discount_lists' => $brand_product_discount_lists]);
     }
 
@@ -66,8 +70,8 @@ class BrandsController extends Controller
 
         $validatedData = $request->validate([
             'discount_target_brand_id' => 'required|exists:mall_brands,id',
-            'discount_percentage' => 'required|numeric|min:0|max:99',
-            'discount_target_min_price' => 'required|numeric|min:0|max:1000000',
+            'discount_percentage' => 'required|integer|min:0|max:99',
+            'discount_target_min_price' => 'required|integer|min:0|max:1000000',
             'discount_start_date' => 'required|date|before_or_equal:discount_end_date',
             'discount_end_date' => 'required|date'
         ]);
@@ -87,8 +91,6 @@ class BrandsController extends Controller
         $brand_discount->start_date = $brand_discount_data['discount_start_date'];
         $brand_discount->end_date = $brand_discount_data['discount_end_date'];
 
-        $brand_discount->save();
-
         return response()->json([]);
     }
 
@@ -96,16 +98,19 @@ class BrandsController extends Controller
 
         $request->validate([
             'discount_target_brand_id' => 'required|exists:mall_brands,id',
-            'discount_target_min_price' => 'required|min:0|max:1000000',
+            'discount_target_min_price' => 'integer|min:0|max:1000000',
+            'discount_percentage' => 'integer|min:0|max:99'
         ]);
 
         $parameters['discount_target_brand_id'] = $request->input('discount_target_brand_id', '');
         $parameters['discount_target_min_price'] = $request->input('discount_target_min_price', 0);
+        $parameters['discount_percentage'] = $request->input('discount_percentage', 0);
 
         $targetProductsOfBrandDiscount = Product::where('brand_id', $parameters['discount_target_brand_id'])
-            ->where('price', '>=', $parameters['discount_target_min_price'])->paginate(10);
+            ->where('price', '>=', $parameters['discount_target_min_price'])
+            ->orderBy('price')
+            ->paginate(10);
         $targetProductsOfBrandDiscount->appends($parameters);
-        //dd($targetProductsOfBrandDiscount);
 
         return response()->json(['targetProducts' => $targetProductsOfBrandDiscount]);
     }
@@ -143,10 +148,6 @@ class BrandsController extends Controller
         ]);
 
         return response()->json([]);
-    }
-
-    public function applyBrandDiscount () {
-
     }
 
 }

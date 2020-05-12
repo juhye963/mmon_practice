@@ -37,7 +37,6 @@
         }
 
         function displaySubCategories(selectedParentCategoryId) {
-            //alert(selectedParentCategoryId);
 
             clearSubCategoriesSelect();
 
@@ -48,12 +47,8 @@
                     category_pid: selectedParentCategoryId
                 }
             }).then(function (response) {
-                //console.log(response);
-                //console.log(response.data.sub_categories.length);
-                //console.log(selectedParentCategoryId);
                 if (response.data.sub_categories) {
                     var subCategoriesData = response.data.sub_categories;
-                    //console.log(response.data.sub_categories);
 
                     createSubCategoriesSelect(subCategoriesData);
 

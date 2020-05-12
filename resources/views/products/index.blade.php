@@ -64,7 +64,6 @@
         }
 
         function deleteCheckedProducts() {
-            //alert('dd');
             var productCheckboxForDeletion = document.getElementsByName('productsSelect[]');
             var checkedProductIdsForDeletion = [];
             for (var i = 0; i < productCheckboxForDeletion.length; i++) {
@@ -103,12 +102,10 @@
 
         function changeCheckedProductsCategory () {
             var selectedProductCheckbox = document.getElementsByName('productsSelect[]');
-            //var checkedProductIds = [];
             var updateCategoryOfCheckedProductFormData = new FormData();
 
             for (var i = 0; i < selectedProductCheckbox.length; i++) {
                 if (selectedProductCheckbox[i].checked) {
-                    //checkedProductIds.push(selectedProductCheckbox[i].value);
                     updateCategoryOfCheckedProductFormData.append('selected_products_to_change_category[]', selectedProductCheckbox[i].value);
                 }
             }
@@ -308,12 +305,10 @@
             </div>
             <td>{{ $product->price }} 원</td>
             <td>
-                @if($product->brand->brandProductDiscount == null || $product->price < $product->brand->brandProductDiscount->from_price)
+                @if($product->brand->brandProductDiscount == null || $product->price < $product->brand->brandProductDiscount->from_price || $product->brand->brandProductDiscount->discount_percentage == 0)
                     {{ $product->discounted_price }} 원
-                @elseif($product->brand->brandProductDiscount->discount_percentage == 0)
-                    {{ $product->price }}
                 @else
-                    {{ $product->price * ($product->brand->brandProductDiscount->discount_percentage/100) }}
+                    {{ $product->price - ($product->price * ($product->brand->brandProductDiscount->discount_percentage/100)) }}
                 @endif
             </td>
             <td>{{ $product->stock }}</td>

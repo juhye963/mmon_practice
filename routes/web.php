@@ -140,6 +140,32 @@ Route::get('/categories/display-sub-categories', [
     'uses' => 'CategoriesController@displaySubCategories'
 ]);
 
+//카테고리 할인
+Route::get('/category-discount-create', [
+    'as' => 'category.discount.create',
+    'uses' => 'CategoriesController@createCategoryDiscount'
+]);
+
+Route::post('/category-discount-store', [
+    'as' => 'category.discount.store',
+    'uses' => 'CategoriesController@storeCategoryDiscount'
+]);
+
+Route::get('/category-discount-list', [
+    'as' => 'category.discount.list',
+    'uses' => 'CategoriesController@listCategoryDiscount'
+]);
+
+Route::get('/category-discount-edit/{category_discount_id}', [
+    'as' => 'category.discount.edit',
+    'uses' => 'categoriesController@editCategoryDiscount'
+]);
+
+Route::post('/category-discount-update', [
+    'as' => 'category.discount.update',
+    'uses' => 'categoriesController@updateCategoryDiscount'
+]);
+
 
 /*브랜드 할인*/
 
@@ -197,7 +223,8 @@ Route::get('/empty-all', function () {
 
     //App\UpdateLog::truncate();
 
-    App\BrandProductDiscount::truncate();
+    //App\BrandProductDiscount::truncate();
+    App\CategoryProductDiscount::truncate();
 
 
     if (config('database.default') !== 'sqlite') {
@@ -207,6 +234,9 @@ Route::get('/empty-all', function () {
 
 
 Route::get('/test', function () {
+
+    $products = \App\BrandProductDiscount::withCount('products')->get();
+    dd($products[0]->products_count);
 
 
     //dd(\App\Product::find(180)->getMostRecentBrandDiscount()->discount_percentage);

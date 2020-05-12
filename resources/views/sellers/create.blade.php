@@ -27,40 +27,38 @@
         }
 
         function register() {
-            var sellerName = document.getElementById('sellerName').value;
-            var sellerEmail = document.getElementById('sellerEmail').value;
-            var sellerPassword = document.getElementById('sellerPassword').value;
-            var sellerBrandId = document.getElementsByName('brand_id')[0].value;
-            var sellerPasswordConfirmation = document.getElementById('sellerPasswordConfirmation').value;
+
+            var resgisterSellerFormData = new FormData();
+
+            resgisterSellerFormData.append('seller_name', document.getElementById('sellerName').value);
+            resgisterSellerFormData.append('seller_email', document.getElementById('sellerEmail').value);
+            resgisterSellerFormData.append('password', document.getElementById('sellerPassword').value);
+            resgisterSellerFormData.append('seller_brand_id', document.getElementsByName('brand_id')[0].value);
+            resgisterSellerFormData.append('password_confirmation', document.getElementById('sellerPasswordConfirmation').value);
 
             axios({
                 method: 'post',
                 url: '{{ route('sellers.store') }}',
-                data: {
-                    name: sellerName,
-                    email: sellerEmail,
-                    password: sellerPassword,
-                    brand_id: sellerBrandId,
-                    password_confirmation: sellerPasswordConfirmation
-                },
+                data: resgisterSellerFormData,
             }).then(function (response) {
-                if (response.data.success_fail_message) {
-                    alert(response.data.success_fail_message)
-                    window.location = '{{ route('home') }}'
-                } else {
-                    console.log(response);
-                }
-            }).catch(function (err) {
-                if (err.response) {
-                    if (err.response.status == 422) {
+                console.log(response)
+                alert('회원가입 성공')
+                window.location = '{{ route('home') }}'
+
+            }).catch(function (error) {
+                console.log(error.response.data);
+                if (error.response) {
+                    if (error.response.status == 422) {
                         alert(Object.values(err.response.data.errors)[0]);
+                    } else if (error.response.status == 500) {
+                        alert('회원가입 실패')
                     } else {
-                        console.log(err.message);
+                        console.log(error.message);
                     }
-                } else if (err.request) {
-                    console.log(err.request);
+                } else if (error.request) {
+                    console.log(error.request);
                 } else {
-                    console.log('Error', err.message);
+                    console.log('Error', error.message);
                 }
                 //console.log(err.config);
             }).finally(function () {

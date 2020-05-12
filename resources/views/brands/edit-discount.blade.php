@@ -14,7 +14,6 @@
     종료날짜 <input type="date" id="discountEndDate" value="{{ $brand_discount_data->end_date }}"><br><br>
 
     <button role="button" id="btnBrandProductDiscountUpdate">저장</button>
-    <button role="button" id="btnNewDiscountTargetProductsDisplay">대상상품보기</button>
 
     <p id="targetProductsIndex">대상상품 인덱스 영역</p>
 
@@ -23,7 +22,17 @@
 
 @section('script_bottom')
     <script>
-        document.getElementById('btnNewDiscountTargetProductsDisplay').addEventListener("click", displayNewDiscountTargetProducts);
+
+        document.getElementById('discountTargetMinPrice').addEventListener("keyup", function () {
+            displayDiscountTargetProducts(1);
+        });
+        document.getElementById('discountPercentage').addEventListener("keyup", function () {
+            displayDiscountTargetProducts(1)
+        });
+        document.getElementById('discountPercentage').addEventListener("click", function () {
+            displayDiscountTargetProducts(1)
+        });
+
         document.getElementById('btnBrandProductDiscountUpdate').addEventListener("click", updateBrandDiscount);
 
         function updateBrandDiscount() {
@@ -61,41 +70,67 @@
             });
         }
 
-        function displayNewDiscountTargetProducts() {
+        function displayDiscountTargetProducts(pageNumber) {
 
-            var discountTargetMinPrice = document.getElementById('discountTargetMinPrice').value; //string
+            var discountTargetMinPrice = parseInt(document.getElementById('discountTargetMinPrice').value);
+            if (isNaN(discountTargetMinPrice)) {
+                discountTargetMinPrice = 0;
+            }
             var discountTargetBrandId = parseInt(document.getElementById('brandIdToApplyDiscountUpdate').value);
-            var dynamicTargetProductsTableHtml = '';
-            console.log(discountTargetBrandId);
-
+            var discountPercentage = parseInt(document.getElementById('discountPercentage').value);
+            if (isNaN(discountPercentage)) {
+                discountPercentage = 0;
+            }
             axios({
                 method: 'get',
-                url: '{{ route('brand.discount.target.product') }}',
+                url: '{{ route("brand.discount.target.product") }}',
                 params: {
                     discount_target_brand_id: discountTargetBrandId,
-                    discount_target_min_price: discountTargetMinPrice
+                    discount_target_min_price: discountTargetMinPrice,
+                    discount_percentage: discountPercentage,
+                    page: pageNumber
                 }
             }).then(function (response) {
-                var targetProducts = response.data.targetProducts;
-                console.log(typeof (targetProducts));
+                console.log(response);
+                var indexHtml = '';
+                var targetProducts = response.data.targetProducts.data;
+                var targetProductsPaginator = response.data.targetProducts;
 
-                dynamicTargetProductsTableHtml += "<p> 총 " + Object.keys(targetProducts).length + " 개의 상품이 조회됨<p>"
-                dynamicTargetProductsTableHtml += "<table border='1' class='table table-bordered text-center'>";
-                dynamicTargetProductsTableHtml += "<thead class='thead-light'>";
-                dynamicTargetProductsTableHtml += "<tr><th>상품명</th><th>가격</th><th>할인가</th>";
-                dynamicTargetProductsTableHtml += "</thead>";
+                indexHtml += "<p> 총 " + targetProductsPaginator.total + " 개의 상품이 조회됨<p>"
+                indexHtml += "<table border='1' class='table table-bordered text-center'>";
+                indexHtml += "<thead class='thead-light'>";
+                indexHtml += "<tr><th>상품아이디</th><th>상품명</th><th>가격</th><th>할인가</th>";
+                indexHtml += "</thead>";
+                for(var x = 0; x < targetProducts.length ; x++) {
+                    indexHtml += "<tr><td>" + targetProducts[x].id + "</td>";
+                    indexHtml += "<td>" + targetProducts[x].name + "</td>";
+                    indexHtml += "<td>" + targetProducts[x].price + " 원 </td>";
+                    if (discountPercentage != 0) {
+                        var discountedPrice = (targetProducts[x].price - (targetProducts[x].price * (discountPercentage/100)));
+                        discountedPrice = Math.floor(discountedPrice/100)*100;
+                        indexHtml += '<td>' + discountedPrice + ' (할인' + discountPercentage +'%) </td></tr>';
+                    } else {
+                        indexHtml += "<td>" + targetProducts[x].discounted_price + " 원 </td></tr>";
+                    }
 
-                for(x in targetProducts) {
-                    dynamicTargetProductsTableHtml += "<tr><td>" + JSON.stringify(targetProducts[x].name) + "</td>";
-                    dynamicTargetProductsTableHtml += "<td>" + JSON.stringify(targetProducts[x].price) + "</td>";
-                    dynamicTargetProductsTableHtml += "<td>" + JSON.stringify(targetProducts[x].discounted_price) + "</td></tr>";
                 }
-                dynamicTargetProductsTableHtml += "</table>";
-                document.getElementById('targetProductsIndex').innerHTML = dynamicTargetProductsTableHtml;
+                indexHtml += "</table>";
+                var currentPage = targetProductsPaginator.current_page;
+                if (targetProductsPaginator.prev_page_url != null) {
+                    indexHtml += "<button role='button' class='btn btn-light' value='"+targetProductsPaginator.prev_page_url+"' onclick='displayDiscountTargetProducts(" + (currentPage - 1) + ")'>이전페이지로</button>"
+                }
+                if (targetProductsPaginator.next_page_url != null) {
+                    indexHtml += "<button role='button' class='btn btn-light' value='"+targetProductsPaginator.next_page_url+"' onclick='displayDiscountTargetProducts(" + (currentPage + 1) + ")'>다음페이지로</button>"
+                }
+
+                document.getElementById('targetProductsIndex').innerHTML = indexHtml;
 
             }).catch(function (error) {
                 if(error.response) {
                     console.log(error.response);
+                    if ( error.response.status === 422 ) {
+                        alert(Object.values(error.response.data.errors)[0]);
+                    }
                 } else if (error.request) {
                     console.log(error.request);
                 } else {

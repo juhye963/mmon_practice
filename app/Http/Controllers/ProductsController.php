@@ -192,7 +192,6 @@ class ProductsController extends Controller
                 break;
         }
 
-        //dd($products);
         $products = $products->paginate(20);
 
 
