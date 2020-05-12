@@ -10,6 +10,8 @@ class CategoryProductDiscount extends Model
 
     protected $fillable = ['category_id', 'from_price', 'discount_percentage', 'start_date', 'end_date'];
 
+    protected $with = ['category'];
+
     public function category()
     {
         return $this->belongsTo(Category::class,'category_id');
@@ -21,10 +23,5 @@ class CategoryProductDiscount extends Model
             ->where('price', '>=', $this->from_price);
     }
 
-    public function getProductsCountAttr()
-    {
-        //return count($this->products);
-        return $this->products()->count();
-    }
 
 }

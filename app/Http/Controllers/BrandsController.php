@@ -51,10 +51,7 @@ class BrandsController extends Controller
 
     public function listBrandDiscounts() {
 
-        /*$brand_product_discount_lists = BrandProductDiscount::withCount(['products' => function (Builder $query) {
-            $query->where('price', '=>', );
-        }])->get();*/
-        $brand_product_discount_lists = BrandProductDiscount::all()->loadCount('products');
+        $brand_product_discount_lists = BrandProductDiscount::all()->sortKeysDesc()->loadCount('products');
         return view('brands.discount-list', ['brand_product_discount_lists' => $brand_product_discount_lists]);
     }
 
@@ -110,6 +107,7 @@ class BrandsController extends Controller
             ->where('price', '>=', $parameters['discount_target_min_price'])
             ->orderBy('price')
             ->paginate(10);
+
         $targetProductsOfBrandDiscount->appends($parameters);
 
         return response()->json(['targetProducts' => $targetProductsOfBrandDiscount]);

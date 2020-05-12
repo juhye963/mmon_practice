@@ -166,6 +166,11 @@ Route::post('/category-discount-update', [
     'uses' => 'categoriesController@updateCategoryDiscount'
 ]);
 
+Route::get('/category-discount-target-product', [
+    'as' => 'category.discount.target.product',
+    'uses' => 'CategoriesController@showTargetProductOfCategoryDiscount'
+]);
+
 
 /*브랜드 할인*/
 

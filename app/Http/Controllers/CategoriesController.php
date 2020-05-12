@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\CategoryProductDiscount;
+use App\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -104,7 +105,7 @@ class CategoriesController extends Controller
     }
 
     public function listCategoryDiscount() {
-        $category_discount_lists = CategoryProductDiscount::all()->sortKeysDesc();
+        $category_discount_lists = CategoryProductDiscount::all()->sortKeysDesc()->loadCount('products');
 
         return view('categories.discount-list')->with(['category_product_discount_lists' => $category_discount_lists]);
 
@@ -143,6 +144,30 @@ class CategoriesController extends Controller
         ]);
 
         return response()->json([]);
+    }
+
+    public function showTargetProductOfCategoryDiscount(Request $request) {
+
+        $request->validate([
+            'discount_target_category_id' => 'required|exists:mall_brands,id',
+            'discount_target_min_price' => 'integer|min:0|max:1000000',
+            //'discount_percentage' => 'integer|min:0|max:99'
+        ]);
+
+
+        $parameters['discount_target_category_id'] = $request->input('discount_target_category_id', '');
+        $parameters['discount_target_min_price'] = $request->input('discount_target_min_price', 0);
+        //$parameters['discount_percentage'] = $request->input('discount_percentage', 0);
+
+
+        $targetProductsOfBrandDiscount = Product::where('category_id', $parameters['discount_target_category_id'])
+            ->where('price', '>=', $parameters['discount_target_min_price'])
+            ->orderBy('price')
+            ->paginate(10);
+
+        $targetProductsOfBrandDiscount->appends($parameters);
+
+        return response()->json(['targetProducts' => $targetProductsOfBrandDiscount]);
     }
 
 }

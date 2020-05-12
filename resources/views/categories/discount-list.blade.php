@@ -24,7 +24,7 @@
                 <td>{{ $discount->category->name }}</td>
                 <td>{{ $discount->from_price }}</td>
                 <td>{{ $discount->discount_percentage }}</td>
-                <td>{{ $discount->products()->count() }}</td>
+                <td>{{ $discount->products_count }}</td>
                 <td>{{ $discount->start_date }}</td>
                 <td>{{ $discount->end_date }}</td>
                 <td>
