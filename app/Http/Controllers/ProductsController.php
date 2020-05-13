@@ -113,7 +113,14 @@ class ProductsController extends Controller
             'sold_out' => '일시품절'
         ];
 
-        $products = Product::with('brand','category','seller','updateLogs');
+        $products = Product::with(
+            'brand',
+            'category',
+            'seller',
+            'updateLogs',
+            'brandProductDiscount',
+            'categoryProductDiscount'
+        );
 
         $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
 
@@ -142,6 +149,7 @@ class ProductsController extends Controller
 
             ]);
         }
+
 
         /*조건적용*/
         //검색키워드로 찾기
@@ -173,6 +181,7 @@ class ProductsController extends Controller
             $products = $products->whereBetween('created_at', [$start_date, $end_date]);
         }
 
+
         //정렬조건 붙이기
         switch ($parameters['sort']) {
             case 'recent':
@@ -193,7 +202,6 @@ class ProductsController extends Controller
         }
 
         $products = $products->paginate(20);
-
 
         return view('products.index')->with([
             'products' => $products,

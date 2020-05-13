@@ -55,5 +55,102 @@
                 console.log('great!XD');
             });
         })
+
+        document.getElementById('discountTargetMinPrice').addEventListener("keyup", function () {
+            showDiscountTargetProduct(1);
+        });
+        document.getElementById('discountPercentage').addEventListener("keyup", function () {
+            showDiscountTargetProduct(1)
+        });
+
+        function showDiscountTargetProduct (pageNumber) {
+
+            var discountTargetCategoryId = document.getElementById('categoryIdToApplyDiscountUpdate').value;
+            var discountTargetMinPrice = document.getElementById('discountTargetMinPrice').value;
+            if (discountTargetMinPrice == '') {
+                discountTargetMinPrice = 0;
+            }
+            var categoryDiscountPercentage = document.getElementById('discountPercentage').value;
+            if (categoryDiscountPercentage == '') {
+                categoryDiscountPercentage = 0;
+            }
+
+            axios({
+                method: 'get',
+                url: '{{ route("category.discount.target.product") }}',
+                params: {
+                    discount_target_category_id: discountTargetCategoryId,
+                    discount_target_min_price: discountTargetMinPrice,
+                    discount_percentage: categoryDiscountPercentage,
+                    page: pageNumber
+                }
+            }).then(function (response) {
+                console.log(response);
+                var indexHtml = '';
+                var targetProducts = response.data.targetProducts.data;
+                var targetProductsPaginator = response.data.targetProducts;
+
+                indexHtml += '<p> 총 ' + targetProductsPaginator.total + ' 개의 상품이 조회됨<p>'
+                indexHtml += '<table border="1" class="table table-bordered text-center">';
+                indexHtml += '<thead class="thead-light">';
+                indexHtml += '<tr><th>상품아이디</th><th>상품명</th><th>가격</th><th>할인율</th><th>할인가</th>';
+                indexHtml += '</thead>';
+                for (var x = 0; x < targetProducts.length; x++) {
+                    indexHtml += '<tr><td>' + targetProducts[x].id + '</td>';
+                    indexHtml += '<td>' + targetProducts[x].name + '</td>';
+                    indexHtml += '<td>' + targetProducts[x].price + ' 원 </td>';
+                    var brandDiscountPercentage = 0;
+                    if (targetProducts[x].brand_product_discount != null) {
+                        brandDiscountPercentage = targetProducts[x].brand_product_discount.discount_percentage;
+                    }
+                    indexHtml += '<td> 브랜드 : ' + brandDiscountPercentage + '% <br> 카테고리 : ' + categoryDiscountPercentage + '%</td>';
+
+                    //계산 위해 정가로 초기화
+                    var discountedPrice = targetProducts[x].price;
+
+                    /*할인가 계산*/
+                    //브랜드 할인율이 0이 아닐때
+                    if (brandDiscountPercentage != 0) {
+                        discountedPrice = discountedPrice - (discountedPrice * (brandDiscountPercentage / 100));
+                        discountedPrice = Math.round(discountedPrice / 100) * 100;
+                    }
+
+                    //카테고리 할인율이 0이 아닐때
+                    if (categoryDiscountPercentage != 0) {
+                        discountedPrice = discountedPrice - (discountedPrice * (categoryDiscountPercentage / 100));
+                        discountedPrice = Math.round(discountedPrice / 100) * 100;
+                    }
+
+                    if (brandDiscountPercentage == 0 && categoryDiscountPercentage == 0) {
+                        discountedPrice = targetProducts[x].discounted_price;
+                    }
+                    indexHtml += '<td>' + discountedPrice + ' 원 </td></tr>';
+
+                }
+                indexHtml += '</table>';
+                var currentPage = targetProductsPaginator.current_page;
+                if (targetProductsPaginator.prev_page_url != null) {
+                    indexHtml += "<button role='button' class='btn btn-light' value='" + targetProductsPaginator.prev_page_url + "' onclick='showDiscountTargetProduct(" + (currentPage - 1) + ")'>이전페이지로</button>"
+                }
+                if (targetProductsPaginator.next_page_url != null) {
+                    indexHtml += "<button role='button' class='btn btn-light' value='" + targetProductsPaginator.next_page_url + "' onclick='showDiscountTargetProduct(" + (currentPage + 1) + ")'>다음페이지로</button>"
+                }
+
+                document.getElementById('targetProductsIndex').innerHTML = indexHtml;
+            }).catch(function (error) {
+                if (error.response) {
+                    console.log(error.response);
+                    if (error.response.status === 422) {
+                        alert(Object.values(error.response.data.errors)[0]);
+                    }
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+            }).finally(function () {
+                console.log('great!XD');
+            });
+        }
     </script>
 @endsection

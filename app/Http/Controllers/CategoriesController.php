@@ -150,17 +150,18 @@ class CategoriesController extends Controller
 
         $request->validate([
             'discount_target_category_id' => 'required|exists:mall_brands,id',
-            'discount_target_min_price' => 'integer|min:0|max:1000000',
-            //'discount_percentage' => 'integer|min:0|max:99'
+            'discount_target_min_price' => 'numeric|min:0|max:1000000',
+            'discount_percentage' => 'numeric|min:0|max:99'
         ]);
 
 
         $parameters['discount_target_category_id'] = $request->input('discount_target_category_id', '');
         $parameters['discount_target_min_price'] = $request->input('discount_target_min_price', 0);
-        //$parameters['discount_percentage'] = $request->input('discount_percentage', 0);
+        $parameters['discount_percentage'] = $request->input('discount_percentage', 0);
 
 
-        $targetProductsOfBrandDiscount = Product::where('category_id', $parameters['discount_target_category_id'])
+        $targetProductsOfBrandDiscount = Product::with('brandProductDiscount')
+            ->where('category_id', $parameters['discount_target_category_id'])
             ->where('price', '>=', $parameters['discount_target_min_price'])
             ->orderBy('price')
             ->paginate(10);

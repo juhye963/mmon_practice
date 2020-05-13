@@ -240,8 +240,10 @@ Route::get('/empty-all', function () {
 
 Route::get('/test', function () {
 
-    $products = \App\BrandProductDiscount::withCount('products')->get();
-    dd($products[0]->products_count);
+
+    $category_discount = \App\Product::find(71200)->categoryProductDiscount->discount_percentage;
+    $brand_discount = \App\Product::find(71200)->brandProductDiscount->discount_percentage;
+    dd($brand_discount.'+'.$category_discount);
 
 
     //dd(\App\Product::find(180)->getMostRecentBrandDiscount()->discount_percentage);

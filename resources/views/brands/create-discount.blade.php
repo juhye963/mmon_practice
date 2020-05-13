@@ -106,17 +106,35 @@
                 indexHtml += "<thead class='thead-light'>";
                 indexHtml += "<tr><th>상품아이디</th><th>상품명</th><th>가격</th><th>할인가</th>";
                 indexHtml += "</thead>";
+
                 for(var x = 0; x < targetProducts.length ; x++) {
                     indexHtml += "<tr><td>" + targetProducts[x].id + "</td>";
-                    indexHtml += "<td>" + targetProducts[x].name + "</td>";
+                    indexHtml += "<td>" + targetProducts[x].name + "</td>";0
                     indexHtml += "<td>" + targetProducts[x].price + " 원 </td>";
+
+                    //할인가 계산 위해 정가로 초기화
+                    var discountedPrice = targetProducts[x].price;
+
+                    /*할인가 계산*/
+                    //브랜드할인율이 0%가 아닐때
                     if (discountPercentage != 0) {
-                        var discountedPrice = (targetProducts[x].price - (targetProducts[x].price * (discountPercentage/100)));
+                        discountedPrice = discountedPrice - (discountedPrice * (discountPercentage/100));
                         discountedPrice = Math.floor(discountedPrice/100)*100;
-                        indexHtml += '<td>' + discountedPrice + ' (할인' + discountPercentage +'%) </td></tr>';
-                    } else {
-                        indexHtml += "<td>" + targetProducts[x].discounted_price + " 원 </td></tr>";
                     }
+
+                    //카테고리할인이 존재할 때
+                    var categoryDiscountOfProduct = targetProducts[x].category_product_discount;
+                    if (categoryDiscountOfProduct != null) {
+                        discountedPrice = discountedPrice - (discountedPrice * (categoryDiscountOfProduct.discount_percentage/100));
+                        discountedPrice = Math.floor(discountedPrice/100)*100 + '카테할인' + categoryDiscountOfProduct.discount_percentage;
+                    }
+
+                    //할인이 아무것도 없으면 기존 할인가로
+                    if (discountPercentage == 0 && categoryDiscountOfProduct == null) {
+                        discountedPrice = targetProducts[x].discounted_price;
+                    }
+
+                    indexHtml += "<td>" + discountedPrice + '/' + discountPercentage + " 원 </td>";
 
                 }
                 indexHtml += "</table>";

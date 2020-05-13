@@ -103,7 +103,8 @@ class BrandsController extends Controller
         $parameters['discount_target_min_price'] = $request->input('discount_target_min_price', 0);
         $parameters['discount_percentage'] = $request->input('discount_percentage', 0);
 
-        $targetProductsOfBrandDiscount = Product::where('brand_id', $parameters['discount_target_brand_id'])
+        $targetProductsOfBrandDiscount = Product::with('categoryProductDiscount')
+            ->where('brand_id', $parameters['discount_target_brand_id'])
             ->where('price', '>=', $parameters['discount_target_min_price'])
             ->orderBy('price')
             ->paginate(10);

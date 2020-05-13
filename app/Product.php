@@ -17,7 +17,7 @@ class Product extends Model
         'name', 'price', 'discounted_price', 'stock', 'seller_id', 'brand_id', 'category_id', 'status'
     ];
 
-    protected $with = ['brand.brandProductDiscount'];
+    //protected $with = ['brand.brandProductDiscount'];
 
     public function category()
     {
@@ -39,6 +39,22 @@ class Product extends Model
         return $this->hasMany(UpdateLog::class, 'product_id')->orderByDesc('updated_at');
     }
 
+    public function brandProductDiscount()
+    {
+        return $this->hasOne(BrandProductDiscount::class,'brand_id', 'brand_id')
+            ->where('start_date', '<=', today())
+            ->where('end_date', '>=', today())
+            ->orderByDesc('id');
+    }
+
+    public function categoryProductDiscount()
+    {
+        return $this->hasOne(CategoryProductDiscount::class,'category_id', 'category_id')
+            ->where('start_date', '<=', today())
+            ->where('end_date', '>=', today())
+            ->orderByDesc('id');
+    }
+
     public function getProductImagePathAttribute()
     {
         return asset(Storage::url('product_image/'.$this->id.'.png'));
@@ -54,5 +70,41 @@ class Product extends Model
         return Arr::random($product_name['adjectives'])
             .' '. Arr::random($product_name['colors'])
             .' '. Arr::random($product_name['items']);
+    }
+
+    public function getDiscountedPrice() {
+
+        /*브랜드할인율, 카테고리할인율 변수 정의*/
+        $brandDiscount = 0;
+        $categoryDiscount = 0;
+        if ($this->brandProductDiscount != null && $this->price >= $this->brandProductDiscount->from_price && $this->brandProductDiscount->discount_percentage != 0) {
+            $brandDiscount = $this->brandProductDiscount->discount_percentage;
+        }
+        if ($this->categoryProductDiscount != null && $this->price >= $this->categoryProductDiscount->from_price && $this->categoryProductDiscount->discount_percentage != 0) {
+            $categoryDiscount = $this->categoryProductDiscount->discount_percentage;
+        }
+
+        /*브랜드할인율과 카테고리 할인율에 따른 할인가 계산*/
+        //계산 위해 정가로 초기화
+        $discountedPrice = $this->price;
+        //브랜드할인율이 0이 아닐때
+        if($brandDiscount != 0) {
+            $discountedPrice = $discountedPrice - ($discountedPrice * ($brandDiscount/100)) ;
+            $discountedPrice = round($discountedPrice/100)*100;
+        }
+        //카테고리할인율이 0이 아닐때
+        if($categoryDiscount != 0) {
+            $discountedPrice = $discountedPrice - ($discountedPrice * ($categoryDiscount/100)) ;
+            $discountedPrice = round($discountedPrice/100)*100;
+        }
+
+        //할인이 없을때
+        if ($brandDiscount == 0 && $categoryDiscount == 0) {
+            $discountedPrice = $this->discounted_price;
+        }
+
+
+        return '브랜드 할인' . $brandDiscount . ', 카테고리할인' . $categoryDiscount . ', 최종 할인가' . $discountedPrice;
+
     }
 }

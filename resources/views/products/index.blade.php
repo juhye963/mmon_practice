@@ -8,17 +8,43 @@
 
 @section('script_bottom')
     <script>
+
+        var discountedPriceTdTag = document.querySelectorAll('.discounted-price');
+        for (var i = 0; i< discountedPriceTdTag.length; i++) {
+
+            /*카테고리할인, 브랜드할인, 정가 변수할당*/
+            var categoryDiscount = JSON.parse(discountedPriceTdTag[i].dataset.categoryDiscount);
+            var brandDiscount = JSON.parse(discountedPriceTdTag[i].dataset.brandDiscount);
+            var productPrice = parseInt(discountedPriceTdTag[i].dataset.productPrice);
+
+            /*할인가 계산*/
+            if(categoryDiscount != null && categoryDiscount.from_price <= productPrice
+                && brandDiscount != null && brandDiscount.from_price <= productPrice) {
+                //카테고리할인과 브랜드할인 모두 있음
+                var discountPrice = productPrice - (productPrice * (categoryDiscount.discount_percentage / 100));
+                discountPrice = discountPrice - (discountPrice * (brandDiscount.discount_percentage / 100));
+                discountedPriceTdTag[i].innerText = Math.round(discountPrice / 100) * 100;
+            } else if (brandDiscount != null && brandDiscount.from_price <= productPrice) {
+                //브랜드할인만 있음
+                var discountPrice = productPrice - (productPrice * (brandDiscount.discount_percentage / 100));
+                discountedPriceTdTag[i].innerText = Math.round(discountPrice / 100) * 100;
+            } else if (categoryDiscount != null && categoryDiscount.from_price <= productPrice) {
+                //카테고리할인만 있음
+                var discountPrice = productPrice - (productPrice * (categoryDiscount.discount_percentage / 100));
+                discountedPriceTdTag[i].innerText =  Math.round(discountPrice / 100) * 100;
+            }
+
+        }
+
         var selectAllButton = document.querySelectorAll('.btn.btn-light.btn-remove');
         for (var i = 0; i < selectAllButton.length; i++) {
             selectAllButton[i].addEventListener('click', deleteThisProduct);
         }
 
         var productUpdateLogsPopupButton = document.querySelectorAll('.btn.btn-primary.update-log-popup');
-        //console.log(productUpdateLogsPopupButton.length);
         for (var i = 0; i < productUpdateLogsPopupButton.length; i++) {
             productUpdateLogsPopupButton[i].addEventListener('click', openProductUpdateLogsPopup);
         }
-
 
         document.getElementById('productMultiDelete').addEventListener('click', deleteCheckedProducts);
         document.getElementById('selectedProductCategoryChange').addEventListener('click', function () {
@@ -304,12 +330,12 @@
                 </div>
             </div>
             <td>{{ $product->price }} 원</td>
-            <td>
-                @if($product->brand->brandProductDiscount == null || $product->price < $product->brand->brandProductDiscount->from_price || $product->brand->brandProductDiscount->discount_percentage == 0)
-                    {{ $product->discounted_price }} 원
-                @else
-                    {{ $product->price - ($product->price * ($product->brand->brandProductDiscount->discount_percentage/100)) }}
-                @endif
+            <td class="discounted-price"
+                data-category-discount= '@json( $product->categoryProductDiscount )'
+                data-brand-discount= '@json($product->brandProductDiscount)'
+                data-product-price='{{ $product->price }}'
+            >
+                {{ $product->discounted_price }} 원
             </td>
             <td>{{ $product->stock }}</td>
             <td>{{ $product->brand->name }}</td>
