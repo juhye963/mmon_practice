@@ -35,8 +35,6 @@ class SellersController extends Controller
             $check_message = '사용 가능한 이메일입니다.';
         }
 
-        //dd($message);
-
         return response()->json([
             "message" => $check_message
         ]);

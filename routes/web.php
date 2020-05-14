@@ -176,32 +176,48 @@ Route::get('/category-discount-target-product', [
 
 Route::get('/brand-discount-list', [
     'as' => 'brand.discount.list',
-    'uses' => 'BrandsController@listBrandDiscounts'
+    'uses' => 'DiscountController@listBrandDiscounts'
 ]);
 
 Route::get('/brand-discount-create', [
     'as' => 'brand.discount.create',
-    'uses' => 'BrandsController@createBrandDiscount'
+    'uses' => 'DiscountController@createBrandDiscount'
 ]);
 
 Route::post('/brand-discount-store', [
     'as' => 'brand.discount.store',
-    'uses' => 'BrandsController@storeBrandDiscount'
+    'uses' => 'DiscountController@storeBrandDiscount'
 ]);
 
 Route::get('/brand-discount-target-product', [
    'as' => 'brand.discount.target.product',
-    'uses' => 'BrandsController@showTargetProductOfBrandDiscount'
+    'uses' => 'DiscountController@showTargetProductOfBrandDiscount'
 ]);
 
 Route::get('/brand-discount-edit/{brand_discount_id}', [
     'as' => 'brand.discount.edit',
-    'uses' => 'BrandsController@editBrandDiscount'
+    'uses' => 'DiscountController@editBrandDiscount'
 ]);
 
 Route::post('/brand-discount-update', [
    'as' => 'brand.discount.update',
-   'uses' => 'BrandsController@updateBrandDiscount'
+   'uses' => 'DiscountController@updateBrandDiscount'
+]);
+
+//할인 제외상품
+Route::get('/brand-discount-exception-products-create', [
+    'as' => 'brand.discount.exceptions.create',
+    'uses' => 'DiscountController@createBrandDiscountExceptionProducts'
+]);
+
+Route::post('/brand-discount-exception-products-store', [
+    'as' => 'brand.discount.exceptions.store',
+    'uses' => 'DiscountController@storeBrandDiscountExceptionProducts'
+]);
+
+Route::get('/brand-discount-exception-target-products', [
+    'as' => 'brand.discount.exceptions.target',
+    'uses' => 'DiscountController@displaySearchedProductsForDiscountExceptions'
 ]);
 
 

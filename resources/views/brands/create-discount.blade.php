@@ -12,9 +12,16 @@
     시작날짜 <input type="date" id="discountStartDate"><br><br>
     종료날짜 <input type="date" id="discountEndDate"><br><br>
 
-    <button role="button" id="btnBrandProductDiscountStore">저장</button>
+    <button role="button" class="btn btn-secondary" id="btnBrandProductDiscountStore">저장</button>
+    <button role="button" data-url="{{ route('brand.discount.exceptions.create') }}" class="btn btn-secondary" id="btnBrandDiscountExceptionsCreate" >
+        할인 제외상품 등록
+    </button>
 
-    <span id="targetProductsIndex">대상상품 인덱스 영역</span>
+    <div id="brandDiscountExceptionsProductId" data-target-product-id-set="">할인제외상품 아이디 미선택</div>
+
+    <div id="targetProductsIndex">대상상품 인덱스 영역</div>
+
+    <button role="button" onclick="storeBrandDiscountExceptionProducts()">할인제외등록테스트</button>
 
 
 @endsection
@@ -22,9 +29,10 @@
 @section('script_bottom')
     <script>
 
-        /*document.getElementById('btnDiscountTargetProductsDisplay').addEventListener("click", function () {
-            displayDiscountTargetProducts(1);
-        });*/
+        document.getElementById('btnBrandDiscountExceptionsCreate').addEventListener("click", function () {
+            window.open(this.dataset.url, "", "width=800,height=800");
+        })
+
         document.getElementById('selectBrandId').addEventListener("change", function () {
             displayDiscountTargetProducts(1);
         });
@@ -50,6 +58,7 @@
             brandDiscountFormData.append('discount_end_date', document.getElementById('discountEndDate').value);
 
 
+
             axios({
                 method: 'post',
                 url:'{{ route("brand.discount.store") }}',
@@ -57,7 +66,9 @@
             }).then(function (response) {
                 console.log(response);
                 alert('할인정보 등록 성공');
-                window.location = '{{ route("brand.discount.list") }}';
+                console.log(response.data.thisBrandDiscountId.id);
+                storeBrandDiscountExceptionProducts(response.data.thisBrandDiscountId.id);
+                //window.location = '{{-- route("brand.discount.list") --}}';
             }).catch(function (error) {
                 if(error.response) {
                     if (error.response.status == 422) {
@@ -166,6 +177,39 @@
             }).finally(function () {
                 console.log('great!XD');
             });
+        }
+
+        function storeBrandDiscountExceptionProducts(brandDiscountId) {
+            var productIdSetString = document.getElementById('brandDiscountExceptionsProductId').dataset.targetProductIdSet;
+            var productIdSet = productIdSetString.split(',');
+
+            var brandDiscountExceptionProductsFormData = new FormData();
+
+            brandDiscountExceptionProductsFormData.append('product_id_set', productIdSet);
+
+            axios({
+                method: 'post',
+                url: '{{ route("brand.discount.exceptions.store") }}',
+                data: {
+                    product_id_set: productIdSet,
+                    brand_discount_id : brandDiscountId
+                }
+            })
+                .then(function (response) {
+                    console.log(response)
+                })
+                .catch(function (error) {
+                    if(error.response) {
+                        console.log(error.response);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                })
+                .finally(function () {
+                    console.log('great!XD');
+                });
         }
     </script>
 @endsection

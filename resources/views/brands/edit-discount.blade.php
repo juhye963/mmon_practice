@@ -13,7 +13,10 @@
     시작날짜 <input type="date" id="discountStartDate" value="{{ $brand_discount_data->start_date }}"><br><br>
     종료날짜 <input type="date" id="discountEndDate" value="{{ $brand_discount_data->end_date }}"><br><br>
 
-    <button role="button" id="btnBrandProductDiscountUpdate">저장</button>
+    <button role="button" class="btn btn-secondary" id="btnBrandProductDiscountUpdate">저장</button>
+    <button role="button" data-url="{{ route('brand.discount.exceptions.create') }}" class="btn btn-secondary" id="btnBrandDiscountExceptionsCreate" >
+        할인 제외상품 등록
+    </button>
 
     <p id="targetProductsIndex">대상상품 인덱스 영역</p>
 
@@ -22,6 +25,10 @@
 
 @section('script_bottom')
     <script>
+
+        document.getElementById('btnBrandDiscountExceptionsCreate').addEventListener("click", function () {
+            window.open(this.dataset.url, "", "width=800,height=800");
+        })
 
         document.getElementById('discountTargetMinPrice').addEventListener("keyup", function () {
             displayDiscountTargetProducts(1);
