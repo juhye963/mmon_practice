@@ -87,6 +87,10 @@
             showDiscountTargetProduct(1)
         });
 
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         function showDiscountTargetProduct (pageNumber) {
             if (document.getElementById('categoryPid').value == 0) {
                 alert('부모 카테고리를 선택해주세요.');
@@ -125,7 +129,7 @@
                 for(var x = 0; x < targetProducts.length ; x++) {
                     indexHtml += '<tr><td>' + targetProducts[x].id + '</td>';
                     indexHtml += '<td>' + targetProducts[x].name + '</td>';
-                    indexHtml += '<td>' + targetProducts[x].price + ' 원 </td>';
+                    indexHtml += '<td>' + numberWithCommas(targetProducts[x].price) + ' 원 </td>';
                     var brandDiscountPercentage = 0;
                     if (targetProducts[x].brand_product_discount != null) {
                         brandDiscountPercentage = targetProducts[x].brand_product_discount.discount_percentage;
@@ -151,7 +155,7 @@
                     if (brandDiscountPercentage == 0 && categoryDiscountPercentage == 0) {
                         discountedPrice = targetProducts[x].discounted_price;
                     }
-                    indexHtml += '<td>' + discountedPrice + ' 원 </td></tr>';
+                    indexHtml += '<td>' + numberWithCommas(discountedPrice) + ' 원 </td></tr>';
 
                 }
                 indexHtml += '</table>';

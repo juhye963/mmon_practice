@@ -23,15 +23,15 @@
                 //카테고리할인과 브랜드할인 모두 있음
                 var discountPrice = productPrice - (productPrice * (categoryDiscount.discount_percentage / 100));
                 discountPrice = discountPrice - (discountPrice * (brandDiscount.discount_percentage / 100));
-                discountedPriceTdTag[i].innerText = Math.round(discountPrice / 100) * 100;
+                discountedPriceTdTag[i].innerText = numberWithCommas(Math.round(discountPrice / 100) * 100) + '원 (카테고리 + 브랜드할인)';
             } else if (brandDiscount != null && brandDiscount.from_price <= productPrice) {
                 //브랜드할인만 있음
                 var discountPrice = productPrice - (productPrice * (brandDiscount.discount_percentage / 100));
-                discountedPriceTdTag[i].innerText = Math.round(discountPrice / 100) * 100;
+                discountedPriceTdTag[i].innerText = numberWithCommas(Math.round(discountPrice / 100) * 100) + '원 (브랜드할인)';
             } else if (categoryDiscount != null && categoryDiscount.from_price <= productPrice) {
                 //카테고리할인만 있음
                 var discountPrice = productPrice - (productPrice * (categoryDiscount.discount_percentage / 100));
-                discountedPriceTdTag[i].innerText =  Math.round(discountPrice / 100) * 100;
+                discountedPriceTdTag[i].innerText =  numberWithCommas(Math.round(discountPrice / 100) * 100) + '원 (카테고리할인)';
             }
 
         }
@@ -55,6 +55,10 @@
             this.dataset.checkedOrNot = true;
             openCategorySelectPage(this.dataset.categorySelectUrl)
         });
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
 
         function openProductUpdateLogsPopup(_event) {
             _event.preventDefault();
@@ -284,7 +288,6 @@
 </div>
 
 
-
 <div id = "selectedCategoryForMultiProductUpdateArea">
     <input type="hidden" value="default" id="selectedCategoryForMultiProductUpdate">
 </div>
@@ -329,15 +332,15 @@
                     </div>
                 </div>
             </div>
-            <td>{{ $product->price }} 원</td>
+            <td>{{ number_format($product->price) }} 원</td>
             <td class="discounted-price"
                 data-category-discount= '@json( $product->categoryProductDiscount )'
                 data-brand-discount= '@json($product->brandProductDiscount)'
                 data-product-price='{{ $product->price }}'
             >
-                {{ $product->discounted_price }} 원
+                {{ number_format($product->discounted_price) }} 원
             </td>
-            <td>{{ $product->stock }}</td>
+            <td>{{ number_format($product->stock) }}</td>
             <td>{{ $product->brand->name }}</td>
             <td>{{ $product->category->name }}</td>
             <td>{{ $product->seller->name }}</td>

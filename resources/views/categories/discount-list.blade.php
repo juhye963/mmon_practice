@@ -22,9 +22,9 @@
             <tr>
                 <td>{{ $discount->id }}</td>
                 <td>{{ $discount->category->name }}</td>
-                <td>{{ $discount->from_price }}</td>
+                <td>{{ number_format($discount->from_price) }}</td>
                 <td>{{ $discount->discount_percentage }}</td>
-                <td>{{ $discount->products_count }}</td>
+                <td>{{ number_format($discount->products_count) }}</td>
                 <td>{{ $discount->start_date }}</td>
                 <td>{{ $discount->end_date }}</td>
                 <td>

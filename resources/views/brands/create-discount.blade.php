@@ -75,6 +75,10 @@
             });
         }
 
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         function displayDiscountTargetProducts(pageNumber) {
 
             var discountTargetMinPrice = parseInt(document.getElementById('discountTargetMinPrice').value);
@@ -110,7 +114,7 @@
                 for(var x = 0; x < targetProducts.length ; x++) {
                     indexHtml += "<tr><td>" + targetProducts[x].id + "</td>";
                     indexHtml += "<td>" + targetProducts[x].name + "</td>";0
-                    indexHtml += "<td>" + targetProducts[x].price + " 원 </td>";
+                    indexHtml += "<td>" + numberWithCommas(targetProducts[x].price) + " 원 </td>";
 
                     //할인가 계산 위해 정가로 초기화
                     var discountedPrice = targetProducts[x].price;
@@ -126,7 +130,7 @@
                     var categoryDiscountOfProduct = targetProducts[x].category_product_discount;
                     if (categoryDiscountOfProduct != null) {
                         discountedPrice = discountedPrice - (discountedPrice * (categoryDiscountOfProduct.discount_percentage/100));
-                        discountedPrice = Math.floor(discountedPrice/100)*100 + '카테할인' + categoryDiscountOfProduct.discount_percentage;
+                        discountedPrice = Math.floor(discountedPrice/100)*100 + ' (카테고리 할인' + categoryDiscountOfProduct.discount_percentage + '%)';
                     }
 
                     //할인이 아무것도 없으면 기존 할인가로
@@ -134,7 +138,7 @@
                         discountedPrice = targetProducts[x].discounted_price;
                     }
 
-                    indexHtml += "<td>" + discountedPrice + '/' + discountPercentage + " 원 </td>";
+                    indexHtml += '<td>' + numberWithCommas(discountedPrice) + '(' + discountPercentage + '%할인) 원 </td>';
 
                 }
                 indexHtml += "</table>";
