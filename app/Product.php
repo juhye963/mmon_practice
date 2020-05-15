@@ -55,6 +55,14 @@ class Product extends Model
             ->orderByDesc('id');
     }
 
+    public function brandDiscountExclusion() {
+        return $this->hasOne(BrandDiscountExclusion::class, 'product_id', 'id');
+    }
+
+    public function categoryDiscountExclusion() {
+        return $this->hasOne(CategoryDiscountExclusion::class, 'product_id', 'id');
+    }
+
     public function getProductImagePathAttribute()
     {
         return asset(Storage::url('product_image/'.$this->id.'.png'));

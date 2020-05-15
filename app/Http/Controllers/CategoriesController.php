@@ -100,7 +100,9 @@ class CategoriesController extends Controller
             'end_date' => $parameters['discount_end_date'],
         ])->save();
 
-        return response()->json([]);
+        $this_category_discount_id = CategoryProductDiscount::orderByDesc('id')->first();
+
+        return response()->json(['thisCategoryDiscountId' => $this_category_discount_id]);
 
     }
 

@@ -113,13 +113,16 @@ class ProductsController extends Controller
             'sold_out' => '일시품절'
         ];
 
+
         $products = Product::with(
             'brand',
             'category',
             'seller',
             'updateLogs',
             'brandProductDiscount',
-            'categoryProductDiscount'
+            'categoryProductDiscount',
+            'brandDiscountExclusion',
+            'categoryDiscountExclusion',
         );
 
         $parameters = $request->only('search_type', 'search_word', 'sort', 'prds_status', 'start_date', 'end_date');
@@ -169,7 +172,6 @@ class ProductsController extends Controller
         }
 
         if ($parameters['prds_status'] != []) {
-            //dd(count($parameters['prds_status']));
             $products = $products->whereIn('status', $parameters['prds_status']);
         }
 

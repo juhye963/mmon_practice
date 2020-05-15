@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Brand;
-use App\BrandDiscountExceptionProducts;
+use App\BrandDiscountExclusion;
 use App\BrandProductDiscount;
+use App\CategoryDiscountExclusion;
 use App\Product;
 use Illuminate\Http\Request;
 
@@ -112,19 +113,23 @@ class DiscountController extends Controller
         return response()->json([]);
     }
 
-    public function createBrandDiscountExceptionProducts () {
-        return view('brands.create-discount-exception');
+    public function createBrandDiscountExcludedProducts () {
+        return view('brands.create-discount-exclusions');
     }
 
-    public function displaySearchedProductsForDiscountExceptions(Request $request) {
+    public function displaySearchedProductsForDiscountExclusions(Request $request) {
 
-        $product_id_set = $request->input('brand_discount_exception_target_product_id', []);
+        $product_id_set = $request->input('brand_discount_exclusion_target_product_id', []);
 
         //유효성검사
 
+        $request->validate([
+            'brand_discount_exclusion_target_product_id' => 'array|between:1,5000'
+        ]);
+
         for ($i = 0; $i < count($product_id_set); $i++) {
             $request->validate([
-                'brand_discount_exception_target_product_id.'.$i => 'numeric'
+                'brand_discount_exclusion_target_product_id.'.$i => 'numeric'
             ]);
         }
 
@@ -134,26 +139,60 @@ class DiscountController extends Controller
         return response()->json(['searchedProduct' => $searched_product]);
     }
 
-    public function storeBrandDiscountExceptionProducts (Request $request) {
+    public function storeBrandDiscountExcludedProducts (Request $request) {
         $product_id_set = $request->input('product_id_set', []);
         $brand_discount_id = $request->input('brand_discount_id');
-        $brandDiscountExceptionProducts = [];
+        $brandDiscountExcludedProducts = [];
+
 
         //넘어온 상품아이디가 상품테이블에 존재하는지 확인
+        //중복상품이 있다면 중복 제거
         for ($i = 0; $i < count($product_id_set); $i++){
-            dump(Product::where('id', $product_id_set[$i])->exists());
             if(Product::where('id', $product_id_set[$i])->exists()
-                && in_array($product_id_set[$i], $brandDiscountExceptionProducts) == false) {
-                $brandDiscountExceptionProducts[$i] =  [
+                && in_array($product_id_set[$i], $brandDiscountExcludedProducts) == false) {
+                $brandDiscountExcludedProducts[$i] =  [
                     'product_id' => $product_id_set[$i],
                     'brand_discount_id' => $brand_discount_id
                 ];
             }
         }
 
-        $result = BrandDiscountExceptionProducts::insert($brandDiscountExceptionProducts);
+        //기존 제외상품 있는데 재등록한 경우 기존제외상품은 지움
+        if (empty($brandDiscountExcludedProducts) == false) {
+            BrandDiscountExclusion::where('brand_discount_id', '=', $brand_discount_id)->delete();
+        }
+
+
+        $result = BrandDiscountExclusion::insert($brandDiscountExcludedProducts);
 
         return response()->json(['result' => $result]);
+    }
+
+    public function storeCategoryDiscountExcludedProducts (Request $request) {
+        $product_id_set = $request->input('product_id_set', []);
+        $category_discount_id = $request->input('category_discount_id');
+        $categoryDiscountExcludedProducts = [];
+
+        //넘어온 상품아이디가 상품테이블에 존재하는지 확인
+        //중복상품이 있다면 중복 제거
+        for ($i = 0; $i < count($product_id_set); $i++){
+            if(Product::where('id', $product_id_set[$i])->exists()
+                && in_array($product_id_set[$i], $categoryDiscountExcludedProducts) == false) {
+                $categoryDiscountExcludedProducts[$i] =  [
+                    'product_id' => $product_id_set[$i],
+                    'category_discount_id' => $category_discount_id
+                ];
+            }
+        }
+
+        if (empty($categoryDiscountExcludedProducts) == false) {
+            CategoryDiscountExclusion::where('category_discount_id', '=', $category_discount_id)->delete();
+        }
+
+        $result = CategoryDiscountExclusion::insert($categoryDiscountExcludedProducts);
+
+        return response()->json(['result' => $result]);
+
     }
 
 }
