@@ -44,17 +44,19 @@ class SellersController extends Controller
     {
         $validatedData = $request->validate([
             'seller_name' => 'required|max:255',
-            'seller_email' => 'required|email|max:255|unique:mall_sellers,email', //unique 검사란??
-            'password' => 'required|confirmed|min:6', //패스워드 confirm 하는 필드가 입력값중 있어야한다는 뜻
+            'seller_email' => 'required|email|max:255|unique:mall_sellers,email',
+            'password' => 'required|confirmed|min:6',
             'seller_brand_id' => 'required|exists:mall_brands,id'
         ]);
 
-        $seller = Seller::insert([
+        $seller = Seller::create([
             'name' => $request->input('seller_name'),
             'email' => $request->input('seller_email'),
             'password' => bcrypt($request->input('password')),
             'brand_id' => $request->input('seller_brand_id')
         ]);
+
+        $seller->save();
 
         return response()->json([]);
     }

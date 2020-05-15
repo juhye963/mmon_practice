@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 class Product extends Model
 {
@@ -79,43 +80,5 @@ class Product extends Model
             .' '. Arr::random($product_name['colors'])
             .' '. Arr::random($product_name['items']);
     }
-
-    /*
-    public function getDiscountedPrice() {
-
-        //브랜드할인율, 카테고리할인율 변수 정의
-        $brandDiscount = 0;
-        $categoryDiscount = 0;
-        if ($this->brandProductDiscount != null && $this->price >= $this->brandProductDiscount->from_price && $this->brandProductDiscount->discount_percentage != 0) {
-            $brandDiscount = $this->brandProductDiscount->discount_percentage;
-        }
-        if ($this->categoryProductDiscount != null && $this->price >= $this->categoryProductDiscount->from_price && $this->categoryProductDiscount->discount_percentage != 0) {
-            $categoryDiscount = $this->categoryProductDiscount->discount_percentage;
-        }
-
-        //브랜드할인율과 카테고리 할인율에 따른 할인가 계산
-        //계산 위해 정가로 초기화
-        $discountedPrice = $this->price;
-        //브랜드할인율이 0이 아닐때
-        if($brandDiscount != 0) {
-            $discountedPrice = $discountedPrice - ($discountedPrice * ($brandDiscount/100)) ;
-            $discountedPrice = round($discountedPrice/100)*100;
-        }
-        //카테고리할인율이 0이 아닐때
-        if($categoryDiscount != 0) {
-            $discountedPrice = $discountedPrice - ($discountedPrice * ($categoryDiscount/100)) ;
-            $discountedPrice = round($discountedPrice/100)*100;
-        }
-
-        //할인이 없을때
-        if ($brandDiscount == 0 && $categoryDiscount == 0) {
-            $discountedPrice = $this->discounted_price;
-        }
-
-
-        return '브랜드 할인' . $brandDiscount . ', 카테고리할인' . $categoryDiscount . ', 최종 할인가' . $discountedPrice;
-
-    }
-    */
 
 }

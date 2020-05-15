@@ -91,6 +91,30 @@ class ProductsController extends Controller
 
     }
 
+    public function showProductsStatistics() {
+        $sellers = DB::table('mall_sellers')
+            ->leftJoin('mall_products', 'mall_sellers.id', '=', 'mall_products.seller_id')
+            ->select('mall_sellers.id', 'mall_sellers.name', 'mall_products.status', DB::raw("COUNT(*) AS count"))
+            ->groupBy('mall_sellers.id', 'mall_products.status')
+            ->get();
+
+        $categories = DB::table('mall_categories')
+            ->leftJoin('mall_products', 'mall_categories.id', '=', 'mall_products.category_id')
+            ->leftJoin('mall_brands', 'mall_brands.id', '=', 'mall_products.brand_id')
+            ->select('mall_categories.id',
+                DB::raw("mall_categories.name AS category_name"),
+                DB::raw("mall_brands.name AS brand_name"),
+                'mall_products.status',
+                DB::raw("COUNT(*) AS count"))
+            ->groupBy('mall_categories.id', 'mall_brands.id', 'mall_products.status')
+            ->get();
+
+        return view('products.statistics')->with([
+            'sellers' => $sellers,
+            'categories' => $categories
+        ]);
+    }
+
     public function index(Request $request)
     {
         /* view 에 필요한 변수 설정 */
@@ -413,7 +437,7 @@ class ProductsController extends Controller
 
 
         for ($i = 0; $i < 100; $i++) {
-            for ($j = 0; $j < 100; $j++) {
+            for ($j = 0; $j < 1000; $j++) {
 
                 $random_seller = $sellers->random(1)->first();
 

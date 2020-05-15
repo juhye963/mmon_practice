@@ -37,4 +37,16 @@ class Brand extends Model
             ->orderByDesc('id');
     }
 
+    public function productCategories()
+    {
+        return $this->hasManyThrough(
+            Category::class,
+            Product::class,
+            'brand_id',
+            'id',
+            'id',
+            'category_id'
+        )->distinct();
+    }
+
 }
