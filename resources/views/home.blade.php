@@ -9,4 +9,5 @@
 <button><a href="{{ route('brand.discount.list') }}">브랜드할인 목록 보기</a></button>
 <button><a href="{{ route('category.discount.create') }}">카테고리 할인 등록</a></button>
 <button><a href="{{ route('category.discount.list') }}">카테고리 할인 목록 보기</a></button>
+<button><a href="{{ route('products.statistics') }}">상품통계보기</a></button>
 

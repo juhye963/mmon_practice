@@ -3,10 +3,10 @@
 @section('content')
     <h1>할인 제외상품 등록 페이지</h1>
     <div class="form-group">
-        <label for="brandDiscountExceptionTargetProductIds">상품 아이디 입력</label>
-        <textarea class="form-control" id="brandDiscountExceptionTargetProductIds" rows="10">할인에서 제외할 상품의 아이디를 입력해주세요. (엔터로 구분)</textarea>
+        <label for="brandDiscountExclusionTargetProductIds">상품 아이디 입력</label>
+        <textarea class="form-control" id="brandDiscountExclusionTargetProductIds" rows="10">할인에서 제외할 상품의 아이디를 입력해주세요. (엔터로 구분)</textarea>
     </div>
-    <button class="btn btn-secondary float-right" id="btnSearchBrandDiscountExceptionTargetProductByIds">상품검색</button>
+    <button class="btn btn-secondary float-right" id="btnSearchBrandDiscountExclusionTargetProductByIds">상품검색</button>
     <div id="searchedProductIndex">
         상품 검색결과 영역
     </div>
@@ -14,19 +14,19 @@
 
 @section('script_bottom')
     <script>
-        document.getElementById('btnSearchBrandDiscountExceptionTargetProductByIds').addEventListener('click', function () {
-            displayBrandDiscountExceptionTargetProducts(1);
+        document.getElementById('btnSearchBrandDiscountExclusionTargetProductByIds').addEventListener('click', function () {
+            displayBrandDiscountExclusionTargetProducts(1);
         });
 
-        function displayBrandDiscountExceptionTargetProducts (pageNumber) {
-            var brandDiscountExceptionTargetProductsIdString = document.getElementById('brandDiscountExceptionTargetProductIds').value;
-            var brandDiscountExceptionTargetProductsId = brandDiscountExceptionTargetProductsIdString.split('\n');
+        function displayBrandDiscountExclusionTargetProducts (pageNumber) {
+            var brandDiscountExclusionTargetProductsIdString = document.getElementById('brandDiscountExclusionTargetProductIds').value;
+            var brandDiscountExclusionTargetProductsId = brandDiscountExclusionTargetProductsIdString.split('\n');
 
             axios({
                 method: 'get',
-                url: '{{ route("brand.discount.exceptions.target") }}',
+                url: '{{ route("brand.discount.exclusion.targets") }}',
                 params: {
-                    brand_discount_exception_target_product_id: brandDiscountExceptionTargetProductsId,
+                    brand_discount_exclusion_target_product_id: brandDiscountExclusionTargetProductsId,
                     page: pageNumber
                 }
             }).then(function (response) {
@@ -53,14 +53,14 @@
                 if (searchedProductPageData.prev_page_url != null) {
                     searchedProductIndexHTML += '<button role="button" class="btn btn-outline-primary" value="'
                         + searchedProductPageData.prev_page_url
-                        + '" onclick="displayBrandDiscountExceptionTargetProducts('
+                        + '" onclick="displayBrandDiscountExclusionTargetProducts('
                         + (currentPage - 1)
                         + ')">prev</button>';
                 }
                 if (searchedProductPageData.next_page_url != null) {
                     searchedProductIndexHTML += '<button role="button" class="btn btn-outline-primary" value="'
                         + searchedProductPageData.prev_page_url
-                        + '" onclick="displayBrandDiscountExceptionTargetProducts('
+                        + '" onclick="displayBrandDiscountExclusionTargetProducts('
                         + (currentPage + 1)
                         + ')">next</button>';
                 }
@@ -99,18 +99,18 @@
                     selectedProductIds.push(productCheckbox[i].value);
                 }
             }
-            window.opener.document.getElementById('brandDiscountExceptionsProductId').dataset.targetProductIdSet = selectedProductIds;
-            window.opener.document.getElementById('brandDiscountExceptionsProductId').innerText = '할인제외상품 선택됨';
-            close();
+            window.opener.document.getElementById('productIdForDiscountExclusion').dataset.targetProductIdSet = selectedProductIds;
+            window.opener.document.getElementById('productIdForDiscountExclusion').innerText = '할인제외상품 선택됨';
+            window.close();
         }
 
         function sendAllSearchedProductIdToParent() {
             console.log('all');
-            var brandDiscountExceptionTargetProductsIdString = document.getElementById('brandDiscountExceptionTargetProductIds').value;
-            var brandDiscountExceptionTargetProductsId = brandDiscountExceptionTargetProductsIdString.split('\n');
-            window.opener.document.getElementById('brandDiscountExceptionsProductId').dataset.targetProductIdSet = brandDiscountExceptionTargetProductsId;
-            window.opener.document.getElementById('brandDiscountExceptionsProductId').innerText = '할인제외상품 선택됨';
-            close();
+            var brandDiscountExclusionTargetProductsIdString = document.getElementById('brandDiscountExclusionTargetProductIds').value;
+            var brandDiscountExclusionTargetProductsId = brandDiscountExclusionTargetProductsIdString.split('\n');
+            window.opener.document.getElementById('productIdForDiscountExclusion').dataset.targetProductIdSet = brandDiscountExclusionTargetProductsId;
+            window.opener.document.getElementById('productIdForDiscountExclusion').innerText = '할인제외상품 선택됨';
+            window.close();
         }
     </script>
 @endsection

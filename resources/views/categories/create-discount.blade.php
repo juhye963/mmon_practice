@@ -18,6 +18,11 @@
 
     <button role="button" class="btn btn-primary float-right" id="btnCategoryProductDiscountStore">저장</button>
     <button role="button" class="btn btn-light float-right" id="btnTargetProductShow">대상상품 보기</button>
+    <button role="button" data-url="{{ route('brand.discount.exclusions.create') }}" class="btn btn-secondary" id="btnDiscountExclusionsCreate" >
+        할인 제외상품 등록
+    </button>
+
+    <div id="productIdForDiscountExclusion" data-target-product-id-set="">할인제외상품 아이디 미선택</div>
 
     <span id="targetProductsIndex">대상상품 인덱스 영역</span>
 
@@ -25,6 +30,7 @@
 @endsection
 
 @section('script_bottom')
+    @parent
     <script>
 
         document.getElementById('btnCategoryProductDiscountStore').addEventListener('click', function () {
@@ -55,7 +61,8 @@
             }).then(function (response) {
                 console.log(response);
                 alert('할인정보 등록 성공');
-                window.location = '{{ route("category.discount.list") }}';
+                storeCategoryDiscountExclusions(response.data.thisCategoryDiscountId.id)
+                //window.location = '{{ route("category.discount.list") }}';
             }).catch(function (error) {
                 if(error.response) {
                     if (error.response.status == 422) {
@@ -85,6 +92,10 @@
         });
         document.getElementById('discountPercentage').addEventListener("keyup", function () {
             showDiscountTargetProduct(1)
+        });
+
+        document.getElementById('btnDiscountExclusionsCreate').addEventListener("click", function () {
+            window.open(this.dataset.url, "", "width=800,height=800");
         });
 
         function numberWithCommas(x) {
@@ -181,7 +192,39 @@
                 }
             }).finally(function () {
                 console.log('great!XD');
-            });;
+            });
         }
+
+        function storeCategoryDiscountExclusions (categoryDiscountId) {
+            var productIdSetString = document.getElementById('productIdForDiscountExclusion').dataset.targetProductIdSet;
+            var productIdSet = productIdSetString.split(',');
+
+            axios({
+                method: 'post',
+                url: '{{ route("category.discount.exclusions.store") }}',
+                data: {
+                    product_id_set: productIdSet,
+                    category_discount_id : categoryDiscountId
+                }
+            })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    if(error.response) {
+                        console.log(error.response);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                })
+                .finally(function () {
+                    console.log('great!');
+                });
+        }
+
+
+
     </script>
 @endsection

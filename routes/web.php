@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 /*
 |--------------------------------------------------------------------------
@@ -205,20 +204,33 @@ Route::post('/brand-discount-update', [
 ]);
 
 //할인 제외상품
-Route::get('/brand-discount-exception-products-create', [
-    'as' => 'brand.discount.exceptions.create',
-    'uses' => 'DiscountController@createBrandDiscountExceptionProducts'
+Route::get('/brand-discount-exclusion-products-create', [
+    'as' => 'brand.discount.exclusions.create',
+    'uses' => 'DiscountController@createBrandDiscountExcludedProducts'
 ]);
 
-Route::post('/brand-discount-exception-products-store', [
-    'as' => 'brand.discount.exceptions.store',
-    'uses' => 'DiscountController@storeBrandDiscountExceptionProducts'
+Route::post('/brand-discount-exclusion-products-store', [
+    'as' => 'brand.discount.exclusions.store',
+    'uses' => 'DiscountController@storeBrandDiscountExcludedProducts'
 ]);
 
-Route::get('/brand-discount-exception-target-products', [
-    'as' => 'brand.discount.exceptions.target',
-    'uses' => 'DiscountController@displaySearchedProductsForDiscountExceptions'
+Route::post('/category-discount-exclusion-products-store', [
+    'as' => 'category.discount.exclusions.store',
+    'uses' => 'DiscountController@storeCategoryDiscountExcludedProducts'
 ]);
+
+Route::get('/brand-discount-exclusion-target-products', [
+    'as' => 'brand.discount.exclusion.targets',
+    'uses' => 'DiscountController@displaySearchedProductsForDiscountExclusions'
+]);
+
+/*상품통계*/
+Route::get('/products-statistics', [
+   'as' => 'products.statistics',
+   'uses' => 'ProductsController@showProductsStatistics'
+]);
+
+
 
 
 
@@ -256,10 +268,30 @@ Route::get('/empty-all', function () {
 
 Route::get('/test', function () {
 
+    $sellers = \App\Seller::find(1500)->with(['productsByStatus'])->get();
+    //$value = \App\Seller::find(1500)->products->groupBy('status');
+    dd($sellers);
 
+    /*//$test = \App\Seller::find(1500)->products->groupBy('status')->get();
+
+    //0 = selling, 1 = stop_selling, 2 = sold_out
+    $value = \App\Seller::with(['products', 'productsByStatus'])->find(1500)->productsByStatus;
+    dd(json_encode($value));*/
+
+    /*$brand = \App\Brand::find(1)->productCategories;
+    dd($brand);*/
+    /*$total = \App\Seller::find(1500)->products->count();
+    $sold_out = \App\Seller::find(1500)->productsByStatus('stop_selling')->count();
+    dd($sold_out);*/
+
+    /*$product = \App\Product::find(69840)->categoryDiscountExclusion;
+
+    dd($product);*/
+
+/*
     $category_discount = \App\Product::find(71200)->categoryProductDiscount->discount_percentage;
     $brand_discount = \App\Product::find(71200)->brandProductDiscount->discount_percentage;
-    dd($brand_discount.'+'.$category_discount);
+    dd($brand_discount.'+'.$category_discount);*/
 
 
     //dd(\App\Product::find(180)->getMostRecentBrandDiscount()->discount_percentage);

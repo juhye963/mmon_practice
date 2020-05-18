@@ -15,20 +15,24 @@
             /*카테고리할인, 브랜드할인, 정가 변수할당*/
             var categoryDiscount = JSON.parse(discountedPriceTdTag[i].dataset.categoryDiscount);
             var brandDiscount = JSON.parse(discountedPriceTdTag[i].dataset.brandDiscount);
+            var brandDiscountExclusion = JSON.parse(discountedPriceTdTag[i].dataset.brandDiscountExclusion);
+            var categoryDiscountExclusion = JSON.parse(discountedPriceTdTag[i].dataset.categoryDiscountExclusion);
             var productPrice = parseInt(discountedPriceTdTag[i].dataset.productPrice);
 
             /*할인가 계산*/
-            if(categoryDiscount != null && categoryDiscount.from_price <= productPrice
-                && brandDiscount != null && brandDiscount.from_price <= productPrice) {
+            if (brandDiscountExclusion != null || categoryDiscountExclusion != null) {
+                discountedPriceTdTag[i].innerText += '(할인제외대상)';
+            } else if(categoryDiscount != null && categoryDiscount.from_price <= productPrice && categoryDiscount.discount_percentage != 0
+                && brandDiscount != null && brandDiscount.from_price <= productPrice && brandDiscount.discount_percentage != 0) {
                 //카테고리할인과 브랜드할인 모두 있음
                 var discountPrice = productPrice - (productPrice * (categoryDiscount.discount_percentage / 100));
                 discountPrice = discountPrice - (discountPrice * (brandDiscount.discount_percentage / 100));
                 discountedPriceTdTag[i].innerText = numberWithCommas(Math.round(discountPrice / 100) * 100) + '원 (카테고리 + 브랜드할인)';
-            } else if (brandDiscount != null && brandDiscount.from_price <= productPrice) {
+            } else if (brandDiscount != null && brandDiscount.from_price <= productPrice && brandDiscount.discount_percentage != 0) {
                 //브랜드할인만 있음
                 var discountPrice = productPrice - (productPrice * (brandDiscount.discount_percentage / 100));
                 discountedPriceTdTag[i].innerText = numberWithCommas(Math.round(discountPrice / 100) * 100) + '원 (브랜드할인)';
-            } else if (categoryDiscount != null && categoryDiscount.from_price <= productPrice) {
+            } else if (categoryDiscount != null && categoryDiscount.from_price <= productPrice && categoryDiscount.discount_percentage != 0) {
                 //카테고리할인만 있음
                 var discountPrice = productPrice - (productPrice * (categoryDiscount.discount_percentage / 100));
                 discountedPriceTdTag[i].innerText =  numberWithCommas(Math.round(discountPrice / 100) * 100) + '원 (카테고리할인)';
@@ -336,6 +340,8 @@
             <td class="discounted-price"
                 data-category-discount= '@json( $product->categoryProductDiscount )'
                 data-brand-discount= '@json($product->brandProductDiscount)'
+                data-brand-discount-exclusion= '@json($product->brandDiscountExclusion)'
+                data-category-discount-exclusion= '@json($product->categoryDiscountExclusion)'
                 data-product-price='{{ $product->price }}'
             >
                 {{ number_format($product->discounted_price) }} 원

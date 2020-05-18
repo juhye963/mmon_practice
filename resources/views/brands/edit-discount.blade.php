@@ -14,9 +14,10 @@
     종료날짜 <input type="date" id="discountEndDate" value="{{ $brand_discount_data->end_date }}"><br><br>
 
     <button role="button" class="btn btn-secondary" id="btnBrandProductDiscountUpdate">저장</button>
-    <button role="button" data-url="{{ route('brand.discount.exceptions.create') }}" class="btn btn-secondary" id="btnBrandDiscountExceptionsCreate" >
-        할인 제외상품 등록
+    <button role="button" data-url="{{ route('brand.discount.exclusions.create') }}" class="btn btn-secondary" id="btnDiscountExclusionsCreate" >
+        할인 제외상품 재등록
     </button>
+    <div id="productIdForDiscountExclusion" data-target-product-id-set="">할인제외상품 아이디 미선택.</div>
 
     <p id="targetProductsIndex">대상상품 인덱스 영역</p>
 
@@ -26,7 +27,7 @@
 @section('script_bottom')
     <script>
 
-        document.getElementById('btnBrandDiscountExceptionsCreate').addEventListener("click", function () {
+        document.getElementById('btnDiscountExclusionsCreate').addEventListener("click", function () {
             window.open(this.dataset.url, "", "width=800,height=800");
         })
 
@@ -63,7 +64,9 @@
             }).then(function (response) {
                 console.log(response);
                 alert('할인정보 업데이트 성공');
-                window.location = '{{ route("brand.discount.list") }}';
+                var thisBrandDiscountId = document.getElementById('brandDiscountId').value;
+                storeBrandDiscountExclusions(thisBrandDiscountId);
+                //window.location = '{{ route("brand.discount.list") }}';
             }).catch(function (error) {
                 if(error.response) {
                     if (error.response.status == 422) {
@@ -167,5 +170,37 @@
                 console.log('great!XD');
             });
         }
+
+
+        function storeBrandDiscountExclusions(brandDiscountId) {
+            var productIdSetString = document.getElementById('productIdForDiscountExclusion').dataset.targetProductIdSet;
+            var productIdSet = productIdSetString.split(',');
+
+            axios({
+                method: 'post',
+                url: '{{ route("brand.discount.exclusions.store") }}',
+                data: {
+                    product_id_set: productIdSet,
+                    brand_discount_id : brandDiscountId
+                }
+            })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    if(error.response) {
+                        console.log(error.response);
+                    } else if (error.request) {
+                        console.log(error.request);
+                    } else {
+                        console.log('Error', error.message);
+                    }
+                })
+                .finally(function () {
+                    console.log('great!');
+                });
+        }
+
+
     </script>
 @endsection

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMallBrandDiscountExceptionProductsTable extends Migration
+class CreateMallBrandDiscountExclusionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateMallBrandDiscountExceptionProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('mall_brand_discount_exception_products', function (Blueprint $table) {
+        Schema::create('mall_brand_discount_exclusions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('brand_discount_id')->unsigned();
             $table->integer('product_id')->unsigned();

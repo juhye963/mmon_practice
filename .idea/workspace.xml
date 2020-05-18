@@ -3,10 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="34ecdf39-dff1-4b5b-84d6-393b0fc1f50c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/BrandsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/BrandsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SellersController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SellersController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ProductsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_05_14_085447_create_mall_brand_discount_exception_products_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/brands/create-discount-exception.blade.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/brands/create-discount.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/brands/create-discount.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/brands/edit-discount.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/brands/edit-discount.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/categories/create-discount.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/categories/create-discount.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/categories/edit-discount.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/categories/edit-discount.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/products/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/products/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -149,6 +154,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\board-test\resources\views\discounts" />
       <recent name="D:\workspace\board-test\resources\views\errors" />
     </key>
   </component>
@@ -201,7 +207,9 @@
       <workItem from="1589244677970" duration="28701000" />
       <workItem from="1589327565140" duration="12273000" />
       <workItem from="1589344435439" duration="14713000" />
-      <workItem from="1589413921413" duration="26211000" />
+      <workItem from="1589413921413" duration="26523000" />
+      <workItem from="1589500856967" duration="29288000" />
+      <workItem from="1589759477464" duration="16835000" />
     </task>
     <servers />
   </component>
@@ -230,15 +238,15 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589261699385" />
-    <state x="690" y="322" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1589424102005">
+    <state x="690" y="322" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1589506986023">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="322" key="#com.intellij.fileTypes.FileTypeChooser/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589424102005" />
+    <state x="690" y="322" key="#com.intellij.fileTypes.FileTypeChooser/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589506986023" />
     <state x="2610" y="322" key="#com.intellij.fileTypes.FileTypeChooser/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586396281611" />
-    <state x="690" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1589446130033">
+    <state x="690" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1589528971039">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589446130033" />
+    <state x="690" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589528971039" />
     <state x="2610" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586739966994" />
     <state x="2659" y="333" key="NewPhpClassDialog" timestamp="1586740001329">
       <screen x="1920" y="0" width="1920" height="1040" />
@@ -260,19 +268,19 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="631" height="446" key="SwitcherDM/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589439323739" />
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1589413929335">
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog" timestamp="1589759477062">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589413929335" />
+    <state x="652" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589759477062" />
     <state x="2572" y="344" key="com.intellij.ide.util.TipDialog/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1586739891954" />
-    <state x="559" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1589188852638">
+    <state x="559" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1589760926817">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="559" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589188852638" />
-    <state x="1928" y="0" width="1618" height="997" key="dock-window-1" timestamp="1589349557239">
-      <screen x="1920" y="0" width="1920" height="1040" />
+    <state x="559" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589760926817" />
+    <state x="844" y="97" width="1644" height="997" key="dock-window-1" timestamp="1589524434809">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1928" y="0" width="1618" height="997" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589349557239" />
+    <state x="844" y="97" width="1644" height="997" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589524434809" />
     <state x="1920" y="0" width="1618" height="997" key="dock-window-2" timestamp="1589413938074">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
@@ -293,19 +301,19 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="215" y="-23" width="1555" height="840" maximized="true" key="dock-window-6/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589274595079" />
-    <state x="837" y="140" width="745" height="807" key="find.popup" timestamp="1589442854673">
+    <state x="837" y="140" width="745" height="807" key="find.popup" timestamp="1589507182483">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="837" y="140" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589442854673" />
+    <state x="837" y="140" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589507182483" />
     <state x="2574" y="117" width="745" height="807" key="find.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1589252245480" />
     <state x="616" y="240" key="run.anything.popup" timestamp="1589173471301">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="616" y="240" key="run.anything.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589173471301" />
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1589354137662">
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup" timestamp="1589535310602">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589354137662" />
+    <state x="716" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1589535310602" />
     <state x="2636" y="262" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1040/0.0.1920.1040@1920.0.1920.1040" timestamp="1589252225681" />
   </component>
   <component name="XDebuggerManager">

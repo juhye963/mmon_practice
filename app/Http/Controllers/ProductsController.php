@@ -92,26 +92,214 @@ class ProductsController extends Controller
     }
 
     public function showProductsStatistics() {
+
+        //셀러를 기준으로 상품상태별 제품수
         $sellers = DB::table('mall_sellers')
             ->leftJoin('mall_products', 'mall_sellers.id', '=', 'mall_products.seller_id')
             ->select('mall_sellers.id', 'mall_sellers.name', 'mall_products.status', DB::raw("COUNT(*) AS count"))
             ->groupBy('mall_sellers.id', 'mall_products.status')
             ->get();
 
+        //카테고리를 기준으로 상품상태별 제품수
         $categories = DB::table('mall_categories')
+            ->leftJoin('mall_products', 'mall_categories.id', '=', 'mall_products.category_id')
+            ->select('mall_categories.id',
+                'mall_categories.name',
+                'mall_products.status',
+                DB::raw("COUNT(*) AS count"),
+                )->groupBy('mall_categories.id', 'mall_products.status')
+            ->get();
+
+        //카테고리기준 브랜드별, 상품상태별 제품수
+        $categoryProductByBrands = DB::table('mall_categories')
             ->leftJoin('mall_products', 'mall_categories.id', '=', 'mall_products.category_id')
             ->leftJoin('mall_brands', 'mall_brands.id', '=', 'mall_products.brand_id')
             ->select('mall_categories.id',
                 DB::raw("mall_categories.name AS category_name"),
+                DB::raw("mall_brands.id AS brand_id"),
                 DB::raw("mall_brands.name AS brand_name"),
                 'mall_products.status',
                 DB::raw("COUNT(*) AS count"))
             ->groupBy('mall_categories.id', 'mall_brands.id', 'mall_products.status')
             ->get();
 
+        //브랜드 기준으로 상품상태별 제품수
+        $brands = DB::table('mall_brands')
+            ->leftJoin('mall_products', 'mall_brands.id', '=', 'mall_products.brand_id')
+            ->select('mall_brands.id',
+                'mall_brands.name',
+                'mall_products.status',
+                DB::raw("COUNT(*) AS count"),
+                )->groupBy('mall_brands.id', 'mall_products.status')
+            ->get();
+
+        //브랜드 기준으로 카테고리별 상품상태별 제품수
+        $brandProductByCategories = DB::table('mall_brands')
+            ->leftJoin('mall_products', 'mall_brands.id', '=', 'mall_products.brand_id')
+            ->leftJoin('mall_categories', 'mall_categories.id', '=', 'mall_products.category_id')
+            ->select('mall_brands.id',
+                DB::raw("mall_brands.name AS brand_name"),
+                DB::raw("mall_categories.id AS category_id"),
+                DB::raw("mall_categories.name AS category_name"),
+                'mall_products.status',
+                DB::raw("COUNT(*) AS count"))
+            ->groupBy('mall_brands.id', 'mall_categories.id', 'mall_products.status')
+            ->get();
+
+        //브랜드별 데이터
+        $brand_statistics = [];
+        /*브랜드기준 카테고리별, 상품상태별 제품수 데이터 형태
+        $category_statistics['id'] = [
+            'name' => '이름',
+            'total' => '숫자',
+            'selling' => '숫자',
+            'stop_selling' => '숫자',
+            'sold_out' => '숫자',
+            'brand_id' => [
+                'brand_name' => '이름',
+                'total' => '숫자',
+                'selling' => '숫자',
+                'stop_selling' => '숫자',
+                'sold_out' => '숫자'
+            ]
+        ];
+        */
+        foreach ($brands as $brand) {
+            if (empty($brand_statistics[$brand->id]) == true) {
+                $brand_statistics[$brand->id] = ['brand_id' => $brand->id, 'brand_name' => $brand->name];
+                $brand_statistics[$brand->id] += ['total' => 0];
+            }
+            $brand_statistics[$brand->id][$brand->status] = $brand->count;
+            $brand_statistics[$brand->id]['total'] = (int)($brand_statistics[$brand->id]['total']) + (int)($brand->count);
+
+            //집계결과 없다면 0
+            if(empty($brand_statistics[$brand->id]['selling'])) {
+                $brand_statistics[$brand->id]['selling'] = 0;
+            }
+            if(empty($brand_statistics[$brand->id]['sold_out'])) {
+                $brand_statistics[$brand->id]['sold_out'] = 0;
+            }
+            if(empty($brand_statistics[$brand->id]['stop_selling'])) {
+                $brand_statistics[$brand->id]['stop_selling'] = 0;
+            }
+        }
+        foreach ($brandProductByCategories as $brandCategory) {
+            if (empty($brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]) == true) {
+                $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id] = ['category_id' => $brandCategory->category_id, 'category_name' => $brandCategory->category_name];
+                $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id] += ['total' => 0];
+            }
+            $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id][$brandCategory->status] = $brandCategory->count;
+            $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['total'] =
+                (int)($brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['total'])
+                + (int)($brandCategory->count);
+
+            //집계 결과가 없는 경우 0
+            if(empty($brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['selling'])) {
+                $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['selling'] = 0;
+            }
+            if(empty($brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['sold_out'])) {
+                $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['sold_out'] = 0;
+            }
+            if(empty($brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['stop_selling'])) {
+                $brand_statistics[$brandCategory->id]['categories'][$brandCategory->category_id]['stop_selling'] = 0;
+            }
+        }
+
+        //카테고리별 데이터
+        $category_statistics = [];
+        /*카테고리기준 브랜드별, 상품상태별 제품수 데이터 형태
+        $category_statistics['id'] = [
+            'name' => '이름',
+            'total' => '숫자',
+            'selling' => '숫자',
+            'stop_selling' => '숫자',
+            'sold_out' => '숫자',
+            'brand_id' => [
+                'brand_name' => '이름',
+                'total' => '숫자',
+                'selling' => '숫자',
+                'stop_selling' => '숫자',
+                'sold_out' => '숫자'
+            ]
+        ];
+        */
+        foreach ($categories as $category) {
+            if (empty($category_statistics[$category->id]) == true) {
+                $category_statistics[$category->id] = ['category_id' => $category->id, 'category_name' => $category->name];
+                $category_statistics[$category->id] += ['total' => 0];
+            }
+            $category_statistics[$category->id][$category->status] = $category->count;
+            $category_statistics[$category->id]['total'] = (int)($category_statistics[$category->id]['total']) + (int)($category->count);
+
+            //집계결과 없다면 0
+            if(empty($category_statistics[$category->id]['selling'])) {
+                $category_statistics[$category->id]['selling'] = 0;
+            }
+            if(empty($category_statistics[$category->id]['sold_out'])) {
+                $category_statistics[$category->id]['sold_out'] = 0;
+            }
+            if(empty($category_statistics[$category->id]['stop_selling'])) {
+                $category_statistics[$category->id]['stop_selling'] = 0;
+            }
+        }
+
+        foreach ($categoryProductByBrands as $categoryBrand) {
+            if (empty($category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]) == true) {
+                $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id] = ['brand_id' => $categoryBrand->brand_id, 'brand_name' => $categoryBrand->brand_name];
+                $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id] += ['total' => 0];
+            }
+            $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id][$categoryBrand->status] = $categoryBrand->count;
+            $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['total'] =
+                (int)($category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['total'])
+                + (int)($categoryBrand->count);
+
+            //집계 결과가 없는 경우 0
+            if(empty($category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['selling'])) {
+                $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['selling'] = 0;
+            }
+            if(empty($category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['sold_out'])) {
+                $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['sold_out'] = 0;
+            }
+            if(empty($category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['stop_selling'])) {
+                $category_statistics[$categoryBrand->id]['brands'][$categoryBrand->brand_id]['stop_selling'] = 0;
+            }
+        }
+
+
+        //셀러별 데이터
+        $seller_statistics = [];
+        /*셀러 기준 상품상태별 제품수 데이터 형태
+         * $seller_statistics = [
+            'seller_id' => [
+                'name' => '이름',
+                'selling' => '숫자',
+                'stop_selling' => '숫자',
+                'sold_out' => '숫자'
+            ],
+        ];
+        */
+        foreach ($sellers as $seller) {
+            if (empty($seller_statistics[$seller->id]) == true) {
+                $seller_statistics[$seller->id] = ['seller_id' => $seller->id, 'seller_name' => $seller->name];
+                $seller_statistics[$seller->id] += ['total' => 0];
+            }
+            $seller_statistics[$seller->id][$seller->status] = $seller->count;
+            $seller_statistics[$seller->id]['total'] = (int)($seller_statistics[$seller->id]['total']) + (int)($seller->count);
+            if(empty($seller_statistics[$seller->id]['selling'])) {
+                $seller_statistics[$seller->id]['selling'] = 0;
+            }
+            if(empty($seller_statistics[$seller->id]['stop_selling'])) {
+                $seller_statistics[$seller->id]['stop_selling'] = 0;
+            }
+            if(empty($seller_statistics[$seller->id]['sold_out'])) {
+                $seller_statistics[$seller->id]['sold_out'] = 0;
+            }
+        }
+
         return view('products.statistics')->with([
-            'sellers' => $sellers,
-            'categories' => $categories
+            'sellers' => $seller_statistics,
+            'categories' => $category_statistics,
+            'brands' => $brand_statistics,
         ]);
     }
 
